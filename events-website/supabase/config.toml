@@ -309,4 +309,4 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 
 [auth.third_party.firebase]
 enabled = true
-project_id = "<id>"
+project_id = "ezkdplmhyrkesixbwqom"

@@ -1,9 +1,11 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
 import { auth } from '../utils/firebase';
+import supabase from '../utils/supabase';
 
 const SignUpScreen = () => {
   const [email, setEmail] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -18,16 +20,31 @@ const SignUpScreen = () => {
       const currentUser = userCredential.user;
        
       if(currentUser){
-                const idToken = await currentUser.getIdToken();
-        const response = await createUser(email, idToken, []);
+      const idToken = await currentUser.getIdToken();
+
+      const { data, error } = await supabase
+      .from('Users')
+      .insert([
+        { user_id: idToken, username: username, email: email, avatar: "https://img.freepik.com/free-photo/yellow-ticket-top-view_1101-121.jpg?semt=ais_items_boosted&w=740"},
+      ])
+      
+      if(error){
+        console.log(error)
+      }
+      if(data){
+        console.log(data)
+        console.log('User created:', userCredential.user);
+        alert('Account created successfully!');
+      }
+          
       }
       
-      console.log('User created:', userCredential.user);
-      alert('Account created successfully!');
+
       
       // Reset form
       setEmail('');
       setPassword('');
+      setUsername('');
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -45,6 +62,23 @@ const SignUpScreen = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          style={{
+            width: '100%',
+            padding: '12px',
+            margin: '8px 0',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            fontSize: '16px',
+            boxSizing: 'border-box'
+          }}
+        />
+        <input
+          type="username"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+          minLength={6}
           style={{
             width: '100%',
             padding: '12px',
