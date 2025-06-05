@@ -1,10 +1,8 @@
-
 import {Link} from "react-router-dom"
 import { useAuth } from '../contexts/authContext'
 
-
-export const Header =() =>{
-    const { userProfile, userLoggedIn, logout } = useAuth()
+export const Header = () => {
+    const { userProfile, userLoggedIn, loading, logout } = useAuth()
     
     const handleLogout = async () => {
         try {
@@ -15,18 +13,25 @@ export const Header =() =>{
             // Handle error (show toast, etc.)
         }
     }
-
-   return (
+    
+    // Show loading state while auth is initializing
+    const getWelcomeMessage = () => {
+        if (loading) return "Loading..."
+        if (userLoggedIn && userProfile?.username) return userProfile.username
+        if (userLoggedIn) return "User"
+        return "Lurker"
+    }
+    
+    return (
         <header id="nav-header">
-            <h1>Welcome, {userProfile?.username || 'Lurker'}!</h1>
+            <h1>Welcome, {getWelcomeMessage()}!</h1>
            
             <nav>
                 <Link to="/home" className="nav-link"> Home </Link>
                 
                 {userLoggedIn ? (
                     <>
-                        {/* <Link to="/profile" className="nav-link">Profile</Link>
-                        <Link to="/dashboard" className="nav-link">Dashboard</Link> */}
+                    
                         <button 
                             onClick={handleLogout} 
                             className="nav-link logout-btn"
@@ -37,12 +42,11 @@ export const Header =() =>{
                 ) : (
                     <>
                         <Link to="/signin" className="nav-link"> Sign In </Link>
-
+                        
                     </>
                 )}
             </nav>
         </header>
     )
-    
-    }
+}
 

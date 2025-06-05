@@ -17,6 +17,7 @@ interface AuthContextType {
   isEmailUser: boolean;
   currentUser: User | null;
   userProfile: UserProfile | null;
+  loading: boolean;
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
   refreshUserProfile: () => Promise<void>;
   logout: () => Promise<void>; // Add logout function
@@ -125,33 +126,38 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   async function initializeUser(user: User | null) {
-    if (user) {
-      setCurrentUser(user);
+    try {
+      if (user) {
+        setCurrentUser(user);
 
-      // Check if provider is email and password login
-      const isEmail = user.providerData.some(
-        (provider) => provider.providerId === "password"
-      );
-      setIsEmailUser(isEmail);
+        // Check if provider is email and password login
+        const isEmail = user.providerData.some(
+          (provider) => provider.providerId === "password"
+        );
+        setIsEmailUser(isEmail);
 
-      // Fetch user profile from Supabase
-      let profile = await fetchUserProfile(user.uid);
-      
-      // If no profile exists, create one
-      if (!profile && user.email) {
-        profile = await createUserProfile(user);
+        // Fetch user profile from Supabase
+        let profile = await fetchUserProfile(user.uid);
+        
+        // If no profile exists, create one
+        if (!profile && user.email) {
+          profile = await createUserProfile(user);
+        }
+
+        setUserProfile(profile);
+        setUserLoggedIn(true);
+      } else {
+        setCurrentUser(null);
+        setUserProfile(null);
+        setUserLoggedIn(false);
+        setIsEmailUser(false);
       }
-
-      setUserProfile(profile);
-      setUserLoggedIn(true);
-    } else {
-      setCurrentUser(null);
-      setUserProfile(null);
-      setUserLoggedIn(false);
-      setIsEmailUser(false);
+    } catch (error) {
+      console.error('Error initializing user:', error);
+    } finally {
+      // Always set loading to false, regardless of success or failure
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   const value: AuthContextType = {
@@ -159,6 +165,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isEmailUser,
     currentUser,
     userProfile,
+    loading,
     setCurrentUser,
     refreshUserProfile,
     logout, // Add logout to context value
@@ -166,7 +173,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {loading ? (
+        <div className="auth-loading">
+          <div>Loading...</div>
+        </div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 }
