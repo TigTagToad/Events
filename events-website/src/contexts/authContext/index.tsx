@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, type ReactNode } from "react";
 import { auth } from "../../utils/firebase";
-import { onAuthStateChanged, type User } from "firebase/auth";
+import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import supabase from "../../utils/supabase";
 
 // Define user profile from Supabase
@@ -19,6 +19,7 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
   refreshUserProfile: () => Promise<void>;
+  logout: () => Promise<void>; // Add logout function
 }
 
 // Define props for AuthProvider
@@ -106,6 +107,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  // Logout function
+  const logout = async (): Promise<void> => {
+    try {
+      await signOut(auth);
+      // Firebase auth state change will automatically trigger initializeUser(null)
+      // which will clear the user state
+    } catch (error) {
+      console.error('Error signing out:', error);
+      throw error; // Re-throw so components can handle the error if needed
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, initializeUser);
     return unsubscribe;
@@ -148,6 +161,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     userProfile,
     setCurrentUser,
     refreshUserProfile,
+    logout, // Add logout to context value
   };
 
   return (
@@ -156,4 +170,3 @@ export function AuthProvider({ children }: AuthProviderProps) {
     </AuthContext.Provider>
   );
 }
-
