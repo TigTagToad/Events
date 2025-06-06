@@ -14,9 +14,9 @@ export const Header = () => {
         }
     }
     
-    // Show loading state while auth is initializing
+    // Show a neutral message during loading instead of "Loading..."
     const getWelcomeMessage = () => {
-        if (loading) return "Loading..."
+        if (loading) return "Welcome!" // Generic message while loading
         if (userLoggedIn && userProfile?.username) return userProfile.username
         if (userLoggedIn) return "User"
         return "Lurker"
@@ -29,24 +29,19 @@ export const Header = () => {
             <nav>
                 <Link to="/home" className="nav-link"> Home </Link>
                 
-                {userLoggedIn ? (
-                    <>
-                    
+                {!loading && (
+                    userLoggedIn ? (
                         <button 
                             onClick={handleLogout} 
                             className="nav-link logout-btn"
                         >
                             Sign Out
                         </button>
-                    </>
-                ) : (
-                    <>
+                    ) : (
                         <Link to="/signin" className="nav-link"> Sign In </Link>
-                        
-                    </>
+                    )
                 )}
             </nav>
         </header>
     )
 }
-

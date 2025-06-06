@@ -1,12 +1,19 @@
 
 import { createClient } from '@supabase/supabase-js';
-import firebase from 'firebase/compat/app';
+import { auth } from './firebase'; // Import your Firebase auth instance
+
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
 const supabaseUser = createClient(supabaseUrl, supabaseKey, {
   accessToken: async () => {
-    return (await firebase.auth().currentUser?.getIdToken(/* forceRefresh */ false)) ?? null
+    // Use the modern Firebase auth instance instead of the legacy one
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      return await currentUser.getIdToken(/* forceRefresh */ false);
+    }
+    return null;
   },
-})
+});
 
-export default supabaseUser
+export default supabaseUser;

@@ -1,8 +1,6 @@
-import { initializeApp } from "firebase/app";
-import { initializeAuth } from "firebase/auth";
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { initializeApp } from "firebase/app";
+import { getAuth} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_KEY,
@@ -15,7 +13,7 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-
 const app = initializeApp(firebaseConfig);
 
-export const auth = initializeAuth(app);
+// Use getAuth instead of initializeAuth for better persistence
+export const auth = getAuth(app);
