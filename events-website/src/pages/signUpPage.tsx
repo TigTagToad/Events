@@ -2,6 +2,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
 import { auth } from '../utils/firebase';
 import supabase from '../utils/supabase';
+import { useNavigate } from 'react-router-dom';
 
 const SignUpScreen = () => {
   const [email, setEmail] = useState<string>("");
@@ -9,6 +10,8 @@ const SignUpScreen = () => {
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  
+  const navigate = useNavigate();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,37 +19,42 @@ const SignUpScreen = () => {
     setLoading(true);
 
     try {
+      // Create Firebase user
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const currentUser = userCredential.user;
        
-      if(currentUser){
-      const idToken = await currentUser.getIdToken();
-
-      const { data, error } = await supabase
-      .from('Users')
-      .insert([
-        { user_id: idToken, username: username, email: email, avatar: "https://img.freepik.com/free-photo/yellow-ticket-top-view_1101-121.jpg?semt=ais_items_boosted&w=740"},
-      ])
-      
-      if(error){
-        console.log(error)
-      }
-      if(data){
-        console.log(data)
-        console.log('User created:', userCredential.user);
-        alert('Account created successfully!');
-      }
+      if (currentUser) {
+        // Insert user profile into Supabase using Firebase UID (not ID token)
+        const { data, error } = await supabase
+          .from('Users')
+          .insert([
+            { 
+              firebase_uid: currentUser.uid, // Use UID, not ID token
+              username: username, 
+              email: email, 
+              avatar_url: "https://img.freepik.com/free-photo/yellow-ticket-top-view_1101-121.jpg?semt=ais_items_boosted&w=740"
+            },
+          ])
+          .select(); // Add select() to get the inserted data
+        
+        if (error) {
+          console.error('Supabase error:', error);
+          setError(`Failed to create user profile: ${error.message}`);
+          return;
+        }
+        
+        if (data) {
+          console.log('User profile created:', data);
+          console.log('Firebase user created:', userCredential.user);
           
+          // Navigate to home page
+          navigate('/home', { replace: true });
+        }
       }
       
-
-      
-      // Reset form
-      setEmail('');
-      setPassword('');
-      setUsername('');
     } catch (err: any) {
-      setError(err.message);
+      console.error('Sign up error:', err);
+      setError(err.message || 'An error occurred during sign up');
     } finally {
       setLoading(false);
     }
@@ -73,12 +81,12 @@ const SignUpScreen = () => {
           }}
         />
         <input
-          type="username"
+          type="text" // Changed from "username" to "text"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
-          minLength={6}
+          minLength={3}
           style={{
             width: '100%',
             padding: '12px',
