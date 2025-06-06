@@ -7,6 +7,7 @@ import SignInScreen from './pages/signInPage'
 import SignUpScreen from './pages/signUpPage'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from "./contexts/authContext"
+import  EventPage from './pages/event'
 function App() {
  
 
@@ -22,6 +23,7 @@ function App() {
       <Route path="/home" element={<Home />} />
       <Route path="/signup" element={<SignUpScreen />} />
       <Route path="/signin" element={<SignInScreen />} />
+      <Route path='/events/:event_id' element={<EventPage />}/>
 
     </Routes>
     </BrowserRouter>
