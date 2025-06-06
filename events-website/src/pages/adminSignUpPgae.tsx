@@ -33,7 +33,7 @@ const AdminSignUpScreen = () => {
               username: username, 
               email: email, 
               avatar_url: "https://img.freepik.com/free-photo/yellow-ticket-top-view_1101-121.jpg?semt=ais_items_boosted&w=740",
-              admin: 'true'
+              admin: true
             },
           ])
           .select(); // Add select() to get the inserted data
@@ -63,7 +63,7 @@ const AdminSignUpScreen = () => {
 
   return (
     <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px' }}>
-      <h2>Sign Up</h2>
+      <h2>Super Secret Admin Sign Up</h2>
       <form onSubmit={handleSignUp}>
         <input
           type="email"

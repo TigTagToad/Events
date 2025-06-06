@@ -8,7 +8,8 @@ interface UserProfile {
   firebase_uid: string;    // Links to Firebase user ID
   email: string;           // User's email address
   username?: string;       // Optional username
-  avatar_url?: string;     // Optional profile picture URL
+  avatar_url?: string;  // Optional profile picture URL
+  admin?: string;    
 }
 
 // Define the shape of our context value - what data/functions the context provides
