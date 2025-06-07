@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import supabase from "../utils/supabase"
 import { useAuth } from "../contexts/authContext"
+import addToGoogleCalendar from "../utils/googleCalender"
 
 const EventPage = () => {
   const { event_id } = useParams()
@@ -18,7 +19,10 @@ const EventPage = () => {
     event_name: '',
     event_date: '',
     event_dsc: '',
-    event_location: ''
+    event_location: '',
+    venue: '',
+    start_time: '',
+    end_time: ''
   })
   const navigate = useNavigate()
 
@@ -99,7 +103,10 @@ const EventPage = () => {
           event_name: editForm.event_name,
           event_date: editForm.event_date,
           event_dsc: editForm.event_dsc,
-          event_location: editForm.event_location
+          event_location: editForm.event_location,
+          venue: editForm.venue,
+          start_time: editForm.start_time,
+          end_time: editForm.end_time
         })
         .eq('event_id', event_id)
         .select()
@@ -172,7 +179,10 @@ const EventPage = () => {
       event_name: event.event_name || '',
       event_date: event.event_date || '',
       event_dsc: event.event_dsc || '',
-      event_location: event.event_location || ''
+      event_location: event.event_location || '',
+      venue: event.venue || '',
+      start_time: event.start_time || '',
+      end_time: event.end_time || ''
     })
     setIsEditing(true)
   }
@@ -183,7 +193,10 @@ const EventPage = () => {
       event_name: '',
       event_date: '',
       event_dsc: '',
-      event_location: ''
+      event_location: '',
+      venue: '',
+      start_time: '',
+      end_time: ''
     })
   }
 
@@ -194,7 +207,7 @@ const EventPage = () => {
       [name]: value
     }))
   }
-
+  
   // Check if user is already signed up
   useEffect(() => {
     const fetchSignUp = async () => {
@@ -270,6 +283,24 @@ const EventPage = () => {
     return <div>Event not found</div>
   }
 
+  const handleAddToCalendar = () => {
+    // Create proper date objects using the event's date and times
+    const eventDate = event.event_date
+    const startTime = event.start_time || '10:00:00'
+    const endTime = event.end_time || '11:00:00'
+    
+    const startDate = new Date(`${eventDate}T${startTime}`)
+    const endDate = new Date(`${eventDate}T${endTime}`)
+    
+    addToGoogleCalendar({
+      title: event.event_name,
+      startDate: startDate,
+      endDate: endDate,
+      description: event.event_dsc,
+      location: event.venue || event.event_location
+    });
+  };
+
   // Render event
   return (
     <div className="event-card">
@@ -291,6 +322,24 @@ const EventPage = () => {
             onChange={handleInputChange}
             style={{ marginBottom: '10px', padding: '8px', width: '100%' }}
           />
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+            <input
+              type="time"
+              name="start_time"
+              value={editForm.start_time}
+              onChange={handleInputChange}
+              placeholder="Start Time"
+              style={{ padding: '8px', flex: 1 }}
+            />
+            <input
+              type="time"
+              name="end_time"
+              value={editForm.end_time}
+              onChange={handleInputChange}
+              placeholder="End Time"
+              style={{ padding: '8px', flex: 1 }}
+            />
+          </div>
           <textarea
             name="event_dsc"
             value={editForm.event_dsc}
@@ -304,7 +353,15 @@ const EventPage = () => {
             name="event_location"
             value={editForm.event_location}
             onChange={handleInputChange}
-            placeholder="Event Location"
+            placeholder="City/Location"
+            style={{ marginBottom: '10px', padding: '8px', width: '100%' }}
+          />
+          <input
+            type="text"
+            name="venue"
+            value={editForm.venue}
+            onChange={handleInputChange}
+            placeholder="Venue"
             style={{ marginBottom: '15px', padding: '8px', width: '100%' }}
           />
           <div style={{ display: 'flex', gap: '10px' }}>
@@ -362,9 +419,13 @@ const EventPage = () => {
               </div>
             )}
           </div>
-          <p>{event.event_date}</p>
+          <p><strong>Date:</strong> {event.event_date}</p>
+          {(event.start_time || event.end_time) && (
+            <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
+          )}
           <p>{event.event_dsc}</p>
           <h4>City: {event.event_location}</h4>
+          {event.venue && <h4>Venue: {event.venue}</h4>}
           <button 
             onClick={handleEventSignUp}
             disabled={signUpLoading}
@@ -380,6 +441,9 @@ const EventPage = () => {
             <p style={{ color: 'green', marginTop: '10px' }}>
               ✓ You are registered for this event
             </p>
+          )}
+          {attending && (
+            <button onClick={handleAddToCalendar}> Add to Google Calendar </button>
           )}
         </>
       )}
