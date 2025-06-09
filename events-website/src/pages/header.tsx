@@ -41,7 +41,8 @@ export const Header = () => {
                         color: 'white', 
                         padding: '2px 6px', 
                         borderRadius: '3px',
-                        fontWeight: 'normal'
+                        fontWeight: 'normal',
+                        maxWidth: '100%'
                     }}>
                         Admin
                     </span>
@@ -53,13 +54,18 @@ export const Header = () => {
                 
                 {!loading && userLoggedIn && isAdmin && !isOnCreateEventPage && (
                     <Link to="/create-event" className="nav-link"> Create Event </Link>
+                    
+                )}
+                {!loading && userLoggedIn && isAdmin && !isOnCreateEventPage && (
+                    <Link to="/signup-admin" className="nav-link"> Create New Admin </Link>
+                    
                 )}
                 
                 {!loading && (
                     userLoggedIn ? (
                         <button 
                             onClick={handleLogout} 
-                            className="nav-link logout-btn"
+                            className="logout-btn"
                         >
                             Sign Out
                         </button>

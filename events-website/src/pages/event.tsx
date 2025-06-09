@@ -300,13 +300,33 @@ const EventPage = () => {
       location: event.venue || event.event_location
     });
   };
-
+   const containerStyle = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '100vh',
+    padding: '20px',
+    boxSizing: 'border-box' as const
+  }
+    const cardStyle = {
+    maxWidth: '600px',
+    width: '90%',
+    padding: '30px',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    borderRadius: '8px',
+    backgroundColor: 'white'
+  }
   // Render event
   return (
-    <div className="event-card">
+     <div style={containerStyle}>
+
+    <div className="event-card" style={cardStyle}>
       {isEditing ? (
         // Edit form
         <div className="edit-form">
+        <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
+              Event Name*
+        </label>
           <input
             type="text"
             name="event_name"
@@ -315,6 +335,9 @@ const EventPage = () => {
             placeholder="Event Name"
             style={{ marginBottom: '10px', padding: '8px', width: '100%' }}
           />
+        <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
+              Event Date*
+        </label>
           <input
             type="date"
             name="event_date"
@@ -323,6 +346,9 @@ const EventPage = () => {
             style={{ marginBottom: '10px', padding: '8px', width: '100%' }}
           />
           <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+        <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
+              Start Time
+        </label>
             <input
               type="time"
               name="start_time"
@@ -331,6 +357,9 @@ const EventPage = () => {
               placeholder="Start Time"
               style={{ padding: '8px', flex: 1 }}
             />
+        <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
+              End Time
+        </label>
             <input
               type="time"
               name="end_time"
@@ -340,6 +369,9 @@ const EventPage = () => {
               style={{ padding: '8px', flex: 1 }}
             />
           </div>
+        <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
+              Event Description
+        </label>
           <textarea
             name="event_dsc"
             value={editForm.event_dsc}
@@ -348,6 +380,9 @@ const EventPage = () => {
             rows={4}
             style={{ marginBottom: '10px', padding: '8px', width: '100%', resize: 'vertical' }}
           />
+        <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
+              Event Location/City
+        </label>
           <input
             type="text"
             name="event_location"
@@ -356,6 +391,9 @@ const EventPage = () => {
             placeholder="City/Location"
             style={{ marginBottom: '10px', padding: '8px', width: '100%' }}
           />
+        <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
+              Venue
+        </label>
           <input
             type="text"
             name="venue"
@@ -384,46 +422,44 @@ const EventPage = () => {
       ) : (
         // Display event
         <>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <h3>{event.event_name}</h3>
-            {isAdmin && (
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button 
-                  onClick={startEditing}
-                  style={{ 
-                    backgroundColor: '#2196F3', 
-                    color: 'white', 
-                    padding: '6px 12px', 
-                    border: 'none', 
-                    borderRadius: '4px',
-                    fontSize: '14px'
-                  }}
-                >
-                  Edit Event
-                </button>
-                <button 
-                  onClick={handleDeleteEvent}
-                  disabled={deleteLoading}
-                  style={{ 
-                    backgroundColor: '#f44336', 
-                    color: 'white', 
-                    padding: '6px 12px', 
-                    border: 'none', 
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    opacity: deleteLoading ? 0.6 : 1
-                  }}
-                >
-                  {deleteLoading ? 'Deleting...' : 'Delete Event'}
-                </button>
-              </div>
-            )}
-          </div>
+          {isAdmin && (
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '15px',  justifyContent: 'center' }}>
+              <button 
+                onClick={startEditing}
+                style={{ 
+                  backgroundColor: '#2196F3', 
+                  color: 'white', 
+                  padding: '6px 12px', 
+                  border: 'none', 
+                  borderRadius: '4px',
+                  fontSize: '14px'
+                }}
+              >
+                Edit Event
+              </button>
+              <button 
+                onClick={handleDeleteEvent}
+                disabled={deleteLoading}
+                style={{ 
+                  backgroundColor: '#f44336', 
+                  color: 'white', 
+                  padding: '6px 12px', 
+                  border: 'none', 
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  opacity: deleteLoading ? 0.6 : 1
+                }}
+              >
+                {deleteLoading ? 'Deleting...' : 'Delete Event'}
+              </button>
+            </div>
+          )}
+          <h3>Event Title: {event.event_name}</h3>
           <p><strong>Date:</strong> {event.event_date}</p>
           {(event.start_time || event.end_time) && (
             <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
           )}
-          <p>{event.event_dsc}</p>
+          <p><strong>Event Discription:</strong> {event.event_dsc}</p>
           <h4>City: {event.event_location}</h4>
           {event.venue && <h4>Venue: {event.venue}</h4>}
           <button 
@@ -448,6 +484,7 @@ const EventPage = () => {
         </>
       )}
     </div>
+     </div>
   )
 }
 

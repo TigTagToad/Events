@@ -68,3 +68,36 @@ button:focus-visible {
   
   
 }
+.nav-link {
+    
+    background: none;
+    border: none;
+    cursor: pointer;
+    
+    
+    color: inherit;
+    text-decoration: none;
+    padding: 8px 16px;
+    margin: 0 4px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    transition: background-color 0.2s ease;
+    display: inline-flex;
+
+}
+
+.nav-link:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.nav-link:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.nav-header {
+    display: inline-flex;
+  width: 100%;
+}
