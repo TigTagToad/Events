@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import supabase from "../utils/supabase"
 import { useAuth } from "../contexts/authContext"
@@ -71,6 +71,10 @@ const CreateEvents = () => {
         ])
         .select()
         .single()
+        
+     if(data){
+        console.log("sucess")
+     }
 
       if (error) {
         console.error('Error creating event:', error)

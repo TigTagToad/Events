@@ -75,6 +75,10 @@ const EventPage = () => {
             },
           ])
           .select()
+        
+        if(data){
+        console.log("sucess")
+     }
 
         if (error) {
           console.error('Error signing up for event:', error)
