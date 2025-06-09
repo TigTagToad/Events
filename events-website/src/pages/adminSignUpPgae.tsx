@@ -8,6 +8,8 @@ const AdminSignUpScreen = () => {
   const [email, setEmail] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("")
+  const [lastName, setLastName] = useState<string>("")
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   
@@ -33,6 +35,8 @@ const AdminSignUpScreen = () => {
               username: username, 
               email: email, 
               avatar_url: "https://img.freepik.com/free-photo/yellow-ticket-top-view_1101-121.jpg?semt=ais_items_boosted&w=740",
+              first_name: firstName,
+              last_name: lastName,
               admin: true
             },
           ])
@@ -88,6 +92,40 @@ const AdminSignUpScreen = () => {
           onChange={(e) => setUsername(e.target.value)}
           required
           minLength={3}
+          style={{
+            width: '100%',
+            padding: '12px',
+            margin: '8px 0',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            fontSize: '16px',
+            boxSizing: 'border-box'
+          }}
+        />
+        <input
+          type="text" 
+          placeholder="fist name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          required
+          minLength={1}
+          style={{
+            width: '100%',
+            padding: '12px',
+            margin: '8px 0',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            fontSize: '16px',
+            boxSizing: 'border-box'
+          }}
+        />
+        <input
+          type="text" 
+          placeholder="last name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          required
+          minLength={1}
           style={{
             width: '100%',
             padding: '12px',

@@ -1,15 +1,20 @@
 import { Link } from "react-router-dom"
 import { useAuth } from "../contexts/authContext"
 
+
 const EventCard = ({ eventlisting }) => {
     const { userProfile } = useAuth()
+
+    const handleEdit = () => {
+
+    }
 
     return (
         <div className="event-card">
             <h3>{eventlisting.event_name}</h3>
             <p>{eventlisting.event_date}</p>
             {userProfile?.admin === 'true' ? (
-    <button>edit</button>
+    <button onClick={handleEdit}>edit</button>
 ) : null}
             {/* <p>{eventlisting.event_dsc}</p> */}
             <h4>City: {eventlisting.event_location}</h4>

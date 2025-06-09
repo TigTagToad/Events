@@ -18,7 +18,7 @@ const CreateEvents = () => {
     start_time: '',
     end_time: ''
   })
-  let eventId = ''
+ 
   // Check if user is admin
   const isAdmin = userProfile?.admin || false
 
@@ -110,206 +110,248 @@ const CreateEvents = () => {
       end_time: ''
     })
     setCreateError(null)
-    navigate('/events', { replace: true })
+    navigate('/home', { replace: true })
   }
 
+  // Container style for centering
+  const containerStyle = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '100vh',
+    padding: '2px',
+    boxSizing: 'border-box' as const
+  }
+
+  // Card style with max width for better readability
+  const cardStyle = {
+    maxWidth: '600px',
+    width: '90%',
+    padding: '30px',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    borderRadius: '8px',
+    backgroundColor: 'white'
+  }
 
   // If user is not admin, show access denied
   if (!isAdmin) {
     return (
-      <div className="event-card">
-        <h3>Access Denied</h3>
-        <p>You must be an admin to create events.</p>
-        <button 
-          onClick={() => navigate('/events')}
-          style={{ 
-            backgroundColor: '#2196F3', 
-            color: 'white', 
-            padding: '8px 16px', 
-            border: 'none', 
-            borderRadius: '4px' 
-          }}
-        >
-          Back to Events
-        </button>
+      <div style={containerStyle}>
+        <div className="event-card" style={cardStyle}>
+          <h3 style={{ textAlign: 'center', marginBottom: '20px' }}>Access Denied</h3>
+          <p style={{ textAlign: 'center', marginBottom: '20px' }}>You must be an admin to create events.</p>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <button 
+              onClick={() => navigate('/home')}
+              style={{ 
+                backgroundColor: '#2196F3', 
+                color: 'white', 
+                padding: '8px 16px', 
+                border: 'none', 
+                borderRadius: '4px' 
+              }}
+            >
+              Back to Events
+            </button>
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="event-card">
-      <h3>Create New Event</h3>
-      
-      {createError && (
-        <div style={{ 
-          color: '#f44336', 
-          backgroundColor: '#ffebee', 
-          padding: '10px', 
-          borderRadius: '4px', 
-          marginBottom: '15px' 
-        }}>
-          {createError}
-        </div>
-      )}
+    <div style={containerStyle}>
+      <div className="event-card" style={cardStyle}>
+        <h3 style={{ textAlign: 'center', marginBottom: '20px' }}>Create New Event</h3>
+        
+        {createError && (
+          <div style={{ 
+            color: '#f44336', 
+            backgroundColor: '#ffebee', 
+            padding: '10px', 
+            borderRadius: '4px', 
+            marginBottom: '15px',
+            textAlign: 'center'
+          }}>
+            {createError}
+          </div>
+        )}
 
-      <form onSubmit={handleCreateEvent} className="create-form">
-        <input
-          type="text"
-          name="event_name"
-          value={createForm.event_name}
-          onChange={handleInputChange}
-          placeholder="Event Name *"
-          required
-          style={{ 
-            marginBottom: '10px', 
-            padding: '8px', 
-            width: '100%',
-            border: '1px solid #ddd',
-            borderRadius: '4px'
-          }}
-        />
-        <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
-              Event Date*
-        </label>
-        <input
-          type="date"
-          name="event_date"
-          value={createForm.event_date}
-          onChange={handleInputChange}
-          required
-          style={{ 
-            marginBottom: '10px', 
-            padding: '8px', 
-            width: '100%',
-            border: '1px solid #ddd',
-            borderRadius: '4px'
-          }}
-        />
-        
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-          <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
-              Start Time
-            </label>
-            <input
-              type="time"
-              name="start_time"
-              value={createForm.start_time}
-              onChange={handleInputChange}
-              placeholder="Start Time"
-              style={{ 
-                padding: '8px', 
-                width: '100%',
-                border: '1px solid #ddd',
-                borderRadius: '4px'
-              }}
-            />
-          </div>
-          <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
-              End Time
-            </label>
-            <input
-              type="time"
-              name="end_time"
-              value={createForm.end_time}
-              onChange={handleInputChange}
-              placeholder="End Time"
-              style={{ 
-                padding: '8px', 
-                width: '100%',
-                border: '1px solid #ddd',
-                borderRadius: '4px'
-              }}
-            />
-          </div>
-        </div>
-        
-        <textarea
-          name="event_dsc"
-          value={createForm.event_dsc}
-          onChange={handleInputChange}
-          placeholder="Event Description"
-          rows={4}
-          style={{ 
-            marginBottom: '10px', 
-            padding: '8px', 
-            width: '100%', 
-            resize: 'vertical',
-            border: '1px solid #ddd',
-            borderRadius: '4px'
-          }}
-        />
-        
-        <input
-          type="text"
-          name="event_location"
-          value={createForm.event_location}
-          onChange={handleInputChange}
-          placeholder="City/Location"
-          style={{ 
-            marginBottom: '10px', 
-            padding: '8px', 
-            width: '100%',
-            border: '1px solid #ddd',
-            borderRadius: '4px'
-          }}
-        />
-        
-        <input
-          type="text"
-          name="venue"
-          value={createForm.venue}
-          onChange={handleInputChange}
-          placeholder="Venue"
-          style={{ 
-            marginBottom: '15px', 
-            padding: '8px', 
-            width: '100%',
-            border: '1px solid #ddd',
-            borderRadius: '4px'
-          }}
-        />
-        
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button 
-            type="submit"
-            disabled={createLoading}
+        <form onSubmit={handleCreateEvent} className="create-form">
+          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
+                Event Name*
+          </label>
+          <input
+            type="text"
+            name="event_name"
+            value={createForm.event_name}
+            onChange={handleInputChange}
+            placeholder="Event Name *"
+            required
             style={{ 
-              backgroundColor: '#4CAF50', 
-              color: 'white', 
-              padding: '10px 20px', 
-              border: 'none', 
+              marginBottom: '10px', 
+              padding: '8px', 
+              width: '100%',
+              border: '1px solid #ddd',
               borderRadius: '4px',
-              cursor: createLoading ? 'not-allowed' : 'pointer',
-              opacity: createLoading ? 0.6 : 1
+              boxSizing: 'border-box'
             }}
-          >
-            {createLoading ? 'Creating Event...' : 'Create Event'}
-          </button>
+          />
+          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
+                Event Date*
+          </label>
+          <input
+            type="date"
+            name="event_date"
+            value={createForm.event_date}
+            onChange={handleInputChange}
+            required
+            style={{ 
+              marginBottom: '10px', 
+              padding: '8px', 
+              width: '100%',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              boxSizing: 'border-box'
+            }}
+          />
           
-          <button 
-            type="button"
-            onClick={handleCancel}
-            disabled={createLoading}
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
+                Start Time
+              </label>
+              <input
+                type="time"
+                name="start_time"
+                value={createForm.start_time}
+                onChange={handleInputChange}
+                placeholder="Start Time"
+                style={{ 
+                  padding: '8px', 
+                  width: '100%',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
+                End Time
+              </label>
+              <input
+                type="time"
+                name="end_time"
+                value={createForm.end_time}
+                onChange={handleInputChange}
+                placeholder="End Time"
+                style={{ 
+                  padding: '8px', 
+                  width: '100%',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+          </div>
+          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
+                Event Description
+          </label>
+          <textarea
+            name="event_dsc"
+            value={createForm.event_dsc}
+            onChange={handleInputChange}
+            placeholder="Event Description"
+            rows={4}
             style={{ 
-              backgroundColor: '#f44336', 
-              color: 'white', 
-              padding: '10px 20px', 
-              border: 'none', 
+              marginBottom: '10px', 
+              padding: '8px', 
+              width: '100%', 
+              resize: 'vertical',
+              border: '1px solid #ddd',
               borderRadius: '4px',
-              cursor: createLoading ? 'not-allowed' : 'pointer',
-              opacity: createLoading ? 0.6 : 1
+              boxSizing: 'border-box'
             }}
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
-      
-      <p style={{ fontSize: '14px', color: '#666', marginTop: '10px' }}>
-        * Required fields
-      </p>
+          />
+          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
+                Event Location
+          </label>
+          <input
+            type="text"
+            name="event_location"
+            value={createForm.event_location}
+            onChange={handleInputChange}
+            placeholder="City/Location"
+            style={{ 
+              marginBottom: '10px', 
+              padding: '8px', 
+              width: '100%',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              boxSizing: 'border-box'
+            }}
+          />
+          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
+                Venue
+          </label>
+          <input
+            type="text"
+            name="venue"
+            value={createForm.venue}
+            onChange={handleInputChange}
+            placeholder="Venue"
+            style={{ 
+              marginBottom: '15px', 
+              padding: '8px', 
+              width: '100%',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              boxSizing: 'border-box'
+            }}
+          />
+          
+          <div style={{ display: 'flex', gap: '10px',  justifyContent: 'center' }}>
+            <button 
+              type="submit"
+              disabled={createLoading}
+              style={{ 
+                backgroundColor: '#4CAF50', 
+                color: 'white', 
+                padding: '10px 20px', 
+                border: 'none', 
+                borderRadius: '4px',
+                cursor: createLoading ? 'not-allowed' : 'pointer',
+                opacity: createLoading ? 0.6 : 1
+              }}
+            >
+              {createLoading ? 'Creating Event...' : 'Create Event'}
+            </button>
+            
+            <button 
+              type="button"
+              onClick={handleCancel}
+              disabled={createLoading}
+              style={{ 
+                backgroundColor: '#f44336', 
+                color: 'white', 
+                padding: '10px 20px', 
+                border: 'none', 
+                borderRadius: '4px',
+                cursor: createLoading ? 'not-allowed' : 'pointer',
+                opacity: createLoading ? 0.6 : 1
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+        
+        <p style={{ fontSize: '14px', color: '#666', marginTop: '10px', textAlign: 'center' }}>
+          * Required fields
+        </p>
+      </div>
     </div>
   )
 }

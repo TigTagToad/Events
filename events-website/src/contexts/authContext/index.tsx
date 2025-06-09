@@ -9,7 +9,9 @@ interface UserProfile {
   email: string;           // User's email address
   username?: string;       // Optional username
   avatar_url?: string;  // Optional profile picture URL
-  admin?: string;    
+  admin?: string; 
+  first_name: string;
+  last_name: string
 }
 
 // Define the shape of our context value - what data/functions the context provides

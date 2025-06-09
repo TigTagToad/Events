@@ -65,7 +65,7 @@ export default function Home() {
     }
     
     if (selectedCity) {
-      query = query.eq('city', selectedCity)
+      query = query.eq('event_location', selectedCity)
     }
     
     // Get total count for pagination
@@ -262,27 +262,38 @@ const styles = {
     height: '100vh',
     overflowY: 'auto' as const,
   },
-  container: {
-    minHeight: '100vh',
-    backgroundColor: '#fff',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  eventsGrid: {
-    flex: 4,
-    margin: '0 auto',
-    width: 400,
-  },
-  pagination: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '10px',
-    margin: '20px 0',
-  },
+container: {
+  minHeight: '100vh',
+  backgroundColor: '#fff',
+  display: 'flex',
+  flexDirection: 'column' as const,
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+  padding: '20px',
+  width: '100%',
+  // overflowX: 'hidden' as const,
+},
+eventsGrid: {
+  display: 'grid',
+  gridTemplateColumns: '1fr',
+  gap: '20px',
+  width: '100%',
+  maxWidth: '600px',
+  margin: '0',
+  boxSizing: 'border-box' as const,
+  
+},
+pagination: {
+  display: 'flex',
+  flexWrap: 'wrap' as const,
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '10px',
+  width: '90%',
+  boxSizing: 'border-box' as const,
+},
   pageNumbers: {
-    display: 'flex',
+    display: 'flex-wrap',
     gap: '5px',
   },
   pageButton: {
@@ -302,7 +313,7 @@ const styles = {
     backgroundColor: '#f8f9fa',
     color: '#6c757d',
     cursor: 'not-allowed',
-    borderColor: '#dee2e6',
+    border: '1px solid #dee2e6',
   },
   pageInfo: {
     textAlign: 'center' as const,
@@ -310,14 +321,17 @@ const styles = {
     color: '#666',
     marginTop: '10px',
   },
-  filtersContainer: {
-    marginBottom: '20px',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '15px',
-    flexWrap: 'wrap' as const,
-  },
+filtersContainer: {
+  marginBottom: '20px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: '15px',
+  flexWrap: 'wrap' as const,
+  width: '100%',
+  padding: '0 16px',
+  boxSizing: 'border-box' as const,
+},
   searchContainer: {
     marginBottom: '20px',
     display: 'flex',
