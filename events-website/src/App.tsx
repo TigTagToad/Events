@@ -8,7 +8,7 @@ import SignUpScreen from './pages/signUpPage'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from "./contexts/authContext"
 import  EventPage from './pages/event'
-import AdminSignUpScreen from './pages/adminSignUpPgae'
+import AdminSignUpScreen from './pages/adminSignUpPage'
 import CreateEvents from './pages/createEvent'
 function App() {
  

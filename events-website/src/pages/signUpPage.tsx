@@ -1,8 +1,9 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { auth } from '../utils/firebase';
 import supabase from '../utils/supabase';
 import { useNavigate } from 'react-router-dom';
+import Loading from '../components/SpinnerLoader';
 
 const SignUpScreen = () => {
   const [email, setEmail] = useState<string>("");
@@ -12,8 +13,16 @@ const SignUpScreen = () => {
   const [lastName, setLastName] = useState<string>("")
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  
+  const [pageLoading, setPageLoading] = useState<boolean>(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+  
+          setTimeout(() => setPageLoading(false), 330)
+      }, [])
+      if (pageLoading) {
+          return <Loading/>
+      }
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,6 +1,7 @@
 import EventCard from '../components/EventCard'
 import { useState, useEffect } from 'react';
 import supabase from "../utils/supabase"
+import Loading from '../components/SpinnerLoader';
 
 const EVENTS_PER_PAGE = 10;
 
