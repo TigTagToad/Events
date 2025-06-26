@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom"
 import { type EventListing } from "../types/eventListing"
 
+
 // Define the props interface
 interface EventCardProps {
     eventlisting: EventListing; // Fixed: lowercase 'eventlisting', correct type
 }
 
 const EventCard = ({ eventlisting }: EventCardProps) => { // Fixed: removed duplicate type annotation
-    
+
 
 
     return (

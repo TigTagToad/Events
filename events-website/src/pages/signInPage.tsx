@@ -1,9 +1,10 @@
-import React, { useState} from 'react'
+import React, { useState, useEffect} from 'react'
 import type { FormEvent } from 'react'
 import { Navigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/authContext'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../utils/firebase'
+import Loading from '../components/SpinnerLoader'
 
 const SignInScreen: React.FC = () => {
     const { userLoggedIn } = useAuth()
@@ -12,6 +13,15 @@ const SignInScreen: React.FC = () => {
     const [password, setPassword] = useState<string>('')
     const [isSigningIn, setIsSigningIn] = useState<boolean>(false)
     const [errorMessage, setErrorMessage] = useState<string>('')
+    const [loading, setLoading] = useState<boolean>(true)
+   
+    useEffect(() => {
+
+        setTimeout(() => setLoading(false), 330)
+    }, [])
+    if (loading) {
+        return <Loading/>
+    }
 
     const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -41,7 +51,6 @@ const SignInScreen: React.FC = () => {
                 <div>
                     <h3>Welcome Back</h3>
                 </div>
-
                 <form onSubmit={onSubmit}>
                     <div>
                         <label>Email</label>
