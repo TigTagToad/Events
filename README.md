@@ -2,6 +2,7 @@
 
 This is a React and TypeScript application built with Vite. It uses Firebase for authentication and Supabase for the database to manage events.
 Video walk through of app: https://youtube.com/shorts/ds-eHSUj4Dk?feature=share
+Link to hosted website: https://events-1-jmmq.onrender.com/
 
 ## Features
 
