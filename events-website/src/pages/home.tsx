@@ -11,12 +11,12 @@ const getEventsPerPage = () => {
   if (typeof window === 'undefined') return 12; // Default for SSR
   
   const width = window.innerWidth;
-  const height = window.innerHeight
-  if (height < 668) return 2;    // Mobile: 6 events
-  if (height < 768) return 4;    // Small tablets: 8 events
-  if (width < 992) return 6;   // Medium tablets: 12 events
-  if (width < 1200) return 8;  // Desktop: 16 events
-  return 12;                    // Large desktop: 20 events
+  const height = window.innerHeight;
+  if (height < 668) return 2;    // Mobile: 2 events
+  if (height < 768) return 4;    // Small tablets: 4 events
+  if (width < 992) return 6;     // Medium tablets: 6 events
+  if (width < 1200) return 8;    // Desktop: 8 events
+  return 12;                     // Large desktop: 12 events
 };
 
 export default function Home() {
@@ -232,14 +232,14 @@ export default function Home() {
   };
 
   return (
-    <Container>
-      <div style={styles.pageInfo}>
-        {/* Search and Filter Bar */}
-        <Row>
-          <Col>
+    <Container fluid style={styles.container}>
+      {/* Search and Filter Bar */}
+      <Row className="mb-4 justify-content-center align-items-end" style={styles.filtersContainer}>
+        <Col xs={12} sm={6} md={4} className="mb-2">
+          <div style={styles.searchInputWrapper}>
             <input
               type="text"
-              placeholder="Search events by name..."
+              placeholder="Search events..."
               value={searchTerm}
               onChange={handleSearchChange}
               style={styles.searchInput}
@@ -253,145 +253,150 @@ export default function Home() {
                 ×
               </button>
             )}
-          </Col>
-          
-          <Col>
-            <select
-              value={selectedCity}
-              onChange={handleCityChange}
-              style={styles.citySelect}
-            >
-              <option value="">All Cities</option>
-              {cities.map((city) => (
-                <option key={city} value={city}>
-                  {city}
-                </option>
-              ))}
-            </select>
-          </Col>
-          
-          {(searchTerm || selectedCity) && (
+          </div>
+        </Col>
+        
+        <Col xs={12} sm={6} md={4} className="mb-2">
+          <select
+            value={selectedCity}
+            onChange={handleCityChange}
+            style={styles.citySelect}
+          >
+            <option value="">All Cities</option>
+            {cities.map((city) => (
+              <option key={city} value={city} title={city}>
+                {city.length > 20 ? `${city.substring(0, 20)}...` : city}
+              </option>
+            ))}
+          </select>
+        </Col>
+        
+        {(searchTerm || selectedCity) && (
+          <Col xs={12} sm={12} md={2} className="mb-2">
             <button
               onClick={clearFilters}
               style={styles.clearFiltersButton}
               title="Clear all filters"
             >
-              Clear Filters
+              Clear All
             </button>
-          )}
-        </Row>
-
-        {fetchError && (<p>{fetchError}</p>)}
-        {loading && (<p>Loading events...</p>)}
-        {events && (
-          <div className='events'>
-            {/* Properly wrapped cards in Row component for centering */}
-            <Row className="justify-content-center">
-              {events.map((eventlisting: any) => (
-                <Col key={eventlisting.event_id} xs={12} sm={6} md={4} lg={3} xl={3} className="mb-4 d-flex justify-content-center">
-                  <EventCard eventlisting={eventlisting} />
-                </Col>
-              ))}
-            </Row>
-            
-            {/* React Bootstrap Pagination */}
-            {totalPages > 1 && (
-              <div style={styles.paginationContainer}>
-                <Pagination>
-                  {renderPaginationItems()}
-                </Pagination>
-              </div>
-            )}
-            
-            <div style={styles.pageInfo}>
-              {searchTerm || selectedCity ? (
-                <>
-                  Page {currentPage + 1} of {totalPages} ( {totalEvents} events found
-                  {searchTerm && ` for "${searchTerm}"`}
-                  {selectedCity && ` in ${selectedCity}`} )
-                  {` • ${eventsPerPage} per page`}
-                </>
-              ) : (
-                <>Page {currentPage + 1} of {totalPages} ({totalEvents} total events • {eventsPerPage} per page)</>
-              )}
-            </div>
-          </div>
+          </Col>
         )}
-      </div>
+      </Row>
+
+      {fetchError && (
+        <Row>
+          <Col>
+            <div className="alert alert-danger text-center">{fetchError}</div>
+          </Col>
+        </Row>
+      )}
+      
+      {loading && (
+        <Row>
+          <Col>
+            <div className="text-center">
+              <div className="spinner-border" role="status">
+                <span className="visually-hidden">Loading events...</span>
+              </div>
+              <p className="mt-2">Loading events...</p>
+            </div>
+          </Col>
+        </Row>
+      )}
+      
+      {events && (
+        <div className='events'>
+          {/* Events Grid with consistent card sizing */}
+          <Row className="justify-content-center g-3" style={styles.eventsRow}>
+            {events.map((eventlisting: any) => (
+              <Col 
+                key={eventlisting.event_id} 
+                xs={12} 
+                sm={6} 
+                md={4} 
+                lg={3} 
+                xl={3}
+                className="d-flex"
+                style={styles.cardColumn}
+              >
+                <EventCard eventlisting={eventlisting} />
+              </Col>
+            ))}
+          </Row>
+          
+          {/* React Bootstrap Pagination */}
+          {totalPages > 1 && (
+            <Row>
+              <Col>
+                <div style={styles.paginationContainer}>
+                  <Pagination>
+                    {renderPaginationItems()}
+                  </Pagination>
+                </div>
+              </Col>
+            </Row>
+          )}
+          
+          {/* Page Info */}
+          <Row>
+            <Col>
+              <div style={styles.pageInfo}>
+                {searchTerm || selectedCity ? (
+                  <>
+                    Page {currentPage + 1} of {totalPages} ( {totalEvents} events found
+                    {searchTerm && ` for "${searchTerm}"`}
+                    {selectedCity && ` in ${selectedCity}`} )
+                    {` • ${eventsPerPage} per page`}
+                  </>
+                ) : (
+                  <>Page {currentPage + 1} of {totalPages} ({totalEvents} total events • {eventsPerPage} per page)</>
+                )}
+              </div>
+            </Col>
+          </Row>
+        </div>
+      )}
     </Container>
   );
 }
 
 const styles = {
-  scrollContainer: {
-    height: '100vh',
-    overflowY: 'auto' as const,
+  container: {
+    minHeight: '100vh',
+    backgroundColor: '#fff',
+    padding: '20px',
   },
-container: {
-  minHeight: '100vh',
-  backgroundColor: '#fff',
-  display: 'flex',
-  flexDirection: 'column' as const,
-  alignItems: 'center',
-  justifyContent: 'flex-start',
-  padding: '20px',
-  width: '100%',
-},
-// eventsGrid: {
-//   display: 'grid',
-//   gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-//   gap: '20px',
-//   width: '100%',
-//   maxWidth: '1200px',
-//   margin: '20px auto',
-//   padding: '0 20px',
-//   boxSizing: 'border-box' as const,
-  
-//   // Responsive breakpoints
-//   '@media (max-width: 768px)': {
-//     gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-//     gap: '15px',
-//     padding: '0 15px',
-//   },
-  
-//   '@media (max-width: 480px)': {
-//     gridTemplateColumns: '1fr',
-//     gap: '10px',
-//     padding: '0 10px',
-//   },
-// },
-paginationContainer: {
-  display: 'flex',
-  justifyContent: 'center',
-  margin: '20px 0',
-  width: '100%',
-},
-pageInfo: {
-  textAlign: 'center' as const,
-  fontSize: '14px',
-  color: '#666',
-  marginTop: '10px',
-},
-filtersContainer: {
-  marginBottom: '20px',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  gap: '15px',
-  flexWrap: 'wrap' as const,
-  width: '100%',
-  padding: '0 16px',
-  boxSizing: 'border-box' as const,
-},
-  searchContainer: {
-    marginBottom: '20px',
+  filtersContainer: {
+    maxWidth: '800px',
+    margin: '0 auto',
+  },
+  eventsRow: {
+    maxWidth: '1400px',
+    margin: '0 auto',
+  },
+  cardColumn: {
     display: 'flex',
     justifyContent: 'center',
+    alignItems: 'stretch',
+    minHeight: 'fit-content',
+  },
+  paginationContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    margin: '30px 0',
+    width: '100%',
+  },
+  pageInfo: {
+    textAlign: 'center' as const,
+    fontSize: '14px',
+    color: '#666',
+    marginTop: '10px',
+    marginBottom: '20px',
   },
   searchInputWrapper: {
     position: 'relative' as const,
-    width: '300px',
-    maxWidth: '100%',
+    width: '100%',
   },
   searchInput: {
     width: '100%',
@@ -401,6 +406,7 @@ filtersContainer: {
     borderRadius: '8px',
     outline: 'none',
     boxSizing: 'border-box' as const,
+    transition: 'border-color 0.2s ease',
   },
   clearButton: {
     position: 'absolute' as const,
@@ -418,30 +424,40 @@ filtersContainer: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  cityFilterWrapper: {
-    width: '200px',
-    maxWidth: '100%',
+    transition: 'color 0.2s ease',
   },
   citySelect: {
     width: '100%',
     padding: '12px 16px',
-    fontSize: '16px',
+    fontSize: '14px',
     border: '2px solid #ddd',
     borderRadius: '8px',
     outline: 'none',
     backgroundColor: '#fff',
     cursor: 'pointer',
     boxSizing: 'border-box' as const,
+    transition: 'border-color 0.2s ease',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap' as const,
   },
   clearFiltersButton: {
-    padding: '12px 20px',
-    fontSize: '14px',
+    width: '100%',
+    padding: '8px 12px',
+    fontSize: '13px',
     backgroundColor: '#f8f9fa',
     border: '2px solid #ddd',
     borderRadius: '8px',
     cursor: 'pointer',
     color: '#666',
-    whiteSpace: 'nowrap' as const,
+    whiteSpace: 'normal' as const,
+    wordWrap: 'break-word' as const,
+    textAlign: 'center' as const,
+    lineHeight: '1.2',
+    transition: 'all 0.2s ease',
+    minHeight: '44px', // Ensures consistent height with other inputs
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   }
 };
