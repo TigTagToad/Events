@@ -18,7 +18,7 @@ const SignUpScreen = () => {
 
   useEffect(() => {
   
-          setTimeout(() => setPageLoading(false), 330)
+          setTimeout(() => setPageLoading(false), 3300)
       }, [])
       if (pageLoading) {
           return <Loading/>

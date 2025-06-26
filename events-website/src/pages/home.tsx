@@ -1,9 +1,23 @@
 import EventCard from '../components/EventCard'
 import { useState, useEffect } from 'react';
 import supabase from "../utils/supabase"
-import Loading from '../components/SpinnerLoader';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Pagination from 'react-bootstrap/Pagination';
 
-const EVENTS_PER_PAGE = 10;
+// Responsive events per page based on screen size
+const getEventsPerPage = () => {
+  if (typeof window === 'undefined') return 12; // Default for SSR
+  
+  const width = window.innerWidth;
+  const height = window.innerHeight
+  if (height < 668) return 2;    // Mobile: 6 events
+  if (height < 768) return 4;    // Small tablets: 8 events
+  if (width < 992) return 6;   // Medium tablets: 12 events
+  if (width < 1200) return 8;  // Desktop: 16 events
+  return 12;                    // Large desktop: 20 events
+};
 
 export default function Home() {
   const [fetchError, setFetchError] = useState<string | null>(null)
@@ -14,8 +28,24 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCity, setSelectedCity] = useState('')
   const [cities, setCities] = useState<string[]>([])
+  const [eventsPerPage, setEventsPerPage] = useState(getEventsPerPage())
 
-  const totalPages = Math.ceil(totalEvents / EVENTS_PER_PAGE)
+  const totalPages = Math.ceil(totalEvents / eventsPerPage)
+
+  // Handle window resize to update events per page
+  useEffect(() => {
+    const handleResize = () => {
+      const newEventsPerPage = getEventsPerPage();
+      if (newEventsPerPage !== eventsPerPage) {
+        setEventsPerPage(newEventsPerPage);
+        // Reset to first page when changing page size to avoid empty pages
+        setCurrentPage(0);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [eventsPerPage]);
 
   useEffect(() => {
     fetchCities()
@@ -23,7 +53,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchEvents()
-  }, [currentPage, searchTerm, selectedCity])
+  }, [currentPage, searchTerm, selectedCity, eventsPerPage])
 
   useEffect(() => {
     // Reset to first page when search term or city filter changes
@@ -77,8 +107,8 @@ export default function Home() {
     }
 
     // Fetch events for current page with search filter, city filter, and alphabetical ordering
-    const startRange = currentPage * EVENTS_PER_PAGE
-    const endRange = startRange + EVENTS_PER_PAGE - 1
+    const startRange = currentPage * eventsPerPage
+    const endRange = startRange + eventsPerPage - 1
 
     let dataQuery = supabase.from('Events').select('*')
     
@@ -107,18 +137,6 @@ export default function Home() {
     setLoading(false)
   }
 
-  const goToNextPage = () => {
-    if (currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1)
-    }
-  }
-
-  const goToPrevPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1)
-    }
-  }
-
   const goToPage = (page: number) => {
     setCurrentPage(page)
   }
@@ -140,12 +158,85 @@ export default function Home() {
     setSelectedCity('')
   }
 
+  // Generate pagination items
+  const renderPaginationItems = () => {
+    let items = [];
+    
+    // Add "First" button if not on first page
+    if (currentPage > 0) {
+      items.push(
+        <Pagination.First key="first" onClick={() => goToPage(0)} href="#" />
+      );
+    }
+    
+    // Add "Previous" button if not on first page
+    if (currentPage > 0) {
+      items.push(
+        <Pagination.Prev key="prev" onClick={() => goToPage(currentPage - 1)} href="#" />
+      );
+    }
+
+    // Calculate which page numbers to show
+    const startPage = Math.max(0, currentPage - 2);
+    const endPage = Math.min(totalPages - 1, currentPage + 2);
+
+    // Add ellipsis at the beginning if needed
+    if (startPage > 0) {
+      items.push(<Pagination.Item key={0} onClick={() => goToPage(0)} href="#">1</Pagination.Item>);
+      if (startPage > 1) {
+        items.push(<Pagination.Ellipsis key="ellipsis-start" />);
+      }
+    }
+
+    // Add page numbers
+    for (let number = startPage; number <= endPage; number++) {
+      items.push(
+        <Pagination.Item
+          key={number}
+          active={number === currentPage}
+          onClick={() => goToPage(number)}
+          href="#"
+        >
+          {number + 1}
+        </Pagination.Item>
+      );
+    }
+
+    // Add ellipsis at the end if needed
+    if (endPage < totalPages - 1) {
+      if (endPage < totalPages - 2) {
+        items.push(<Pagination.Ellipsis key="ellipsis-end" />);
+      }
+      items.push(
+        <Pagination.Item key={totalPages - 1} onClick={() => goToPage(totalPages - 1)} href="#">
+          {totalPages}
+        </Pagination.Item>
+      );
+    }
+
+    // Add "Next" button if not on last page
+    if (currentPage < totalPages - 1) {
+      items.push(
+        <Pagination.Next key="next" onClick={() => goToPage(currentPage + 1)} href="#" />
+      );
+    }
+    
+    // Add "Last" button if not on last page
+    if (currentPage < totalPages - 1) {
+      items.push(
+        <Pagination.Last key="last" onClick={() => goToPage(totalPages - 1)} href="#" />
+      );
+    }
+
+    return items;
+  };
+
   return (
-    <div style={styles.container}>
-      <div>
+    <Container>
+      <div style={styles.pageInfo}>
         {/* Search and Filter Bar */}
-        <div style={styles.filtersContainer}>
-          <div style={styles.searchInputWrapper}>
+        <Row>
+          <Col>
             <input
               type="text"
               placeholder="Search events by name..."
@@ -162,9 +253,9 @@ export default function Home() {
                 ×
               </button>
             )}
-          </div>
+          </Col>
           
-          <div style={styles.cityFilterWrapper}>
+          <Col>
             <select
               value={selectedCity}
               onChange={handleCityChange}
@@ -177,7 +268,7 @@ export default function Home() {
                 </option>
               ))}
             </select>
-          </div>
+          </Col>
           
           {(searchTerm || selectedCity) && (
             <button
@@ -188,73 +279,46 @@ export default function Home() {
               Clear Filters
             </button>
           )}
-        </div>
+        </Row>
 
         {fetchError && (<p>{fetchError}</p>)}
         {loading && (<p>Loading events...</p>)}
         {events && (
           <div className='events'>
-            <div style={styles.eventsGrid}>
+            {/* Properly wrapped cards in Row component for centering */}
+            <Row className="justify-content-center">
               {events.map((eventlisting: any) => (
-                <EventCard key={eventlisting.event_id} eventlisting={eventlisting} />
+                <Col key={eventlisting.event_id} xs={12} sm={6} md={4} lg={3} xl={3} className="mb-4 d-flex justify-content-center">
+                  <EventCard eventlisting={eventlisting} />
+                </Col>
               ))}
-            </div>
+            </Row>
             
-            {/* Pagination Controls */}
-            <div style={styles.pagination}>
-              <button 
-                onClick={goToPrevPage} 
-                disabled={currentPage === 0}
-                style={{
-                  ...styles.pageButton,
-                  ...(currentPage === 0 ? styles.disabledButton : {})
-                }}
-              >
-                Previous
-              </button>
-              
-              <div style={styles.pageNumbers}>
-                {Array.from({ length: totalPages }, (_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => goToPage(index)}
-                    style={{
-                      ...styles.pageButton,
-                      ...(currentPage === index ? styles.activePageButton : {})
-                    }}
-                  >
-                    {index + 1}
-                  </button>
-                ))}
+            {/* React Bootstrap Pagination */}
+            {totalPages > 1 && (
+              <div style={styles.paginationContainer}>
+                <Pagination>
+                  {renderPaginationItems()}
+                </Pagination>
               </div>
-              
-              <button 
-                onClick={goToNextPage} 
-                disabled={currentPage >= totalPages - 1}
-                style={{
-                  ...styles.pageButton,
-                  ...(currentPage >= totalPages - 1 ? styles.disabledButton : {})
-                }}
-              >
-                Next
-              </button>
-            </div>
+            )}
             
             <div style={styles.pageInfo}>
               {searchTerm || selectedCity ? (
                 <>
-                  Page {currentPage + 1} of {totalPages} ({totalEvents} events found
+                  Page {currentPage + 1} of {totalPages} ( {totalEvents} events found
                   {searchTerm && ` for "${searchTerm}"`}
-                  {selectedCity && ` in ${selectedCity}`})
+                  {selectedCity && ` in ${selectedCity}`} )
+                  {` • ${eventsPerPage} per page`}
                 </>
               ) : (
-                <>Page {currentPage + 1} of {totalPages} ({totalEvents} total events)</>
+                <>Page {currentPage + 1} of {totalPages} ({totalEvents} total events • {eventsPerPage} per page)</>
               )}
             </div>
           </div>
         )}
       </div>
-    </div>
+    </Container>
   );
 }
 
@@ -272,56 +336,42 @@ container: {
   justifyContent: 'flex-start',
   padding: '20px',
   width: '100%',
-  // overflowX: 'hidden' as const,
 },
-eventsGrid: {
-  display: 'grid',
-  gridTemplateColumns: '1fr',
-  gap: '20px',
-  width: '100%',
-  maxWidth: '600px',
-  margin: '0',
-  boxSizing: 'border-box' as const,
+// eventsGrid: {
+//   display: 'grid',
+//   gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+//   gap: '20px',
+//   width: '100%',
+//   maxWidth: '1200px',
+//   margin: '20px auto',
+//   padding: '0 20px',
+//   boxSizing: 'border-box' as const,
   
-},
-pagination: {
+//   // Responsive breakpoints
+//   '@media (max-width: 768px)': {
+//     gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+//     gap: '15px',
+//     padding: '0 15px',
+//   },
+  
+//   '@media (max-width: 480px)': {
+//     gridTemplateColumns: '1fr',
+//     gap: '10px',
+//     padding: '0 10px',
+//   },
+// },
+paginationContainer: {
   display: 'flex',
-  flexWrap: 'wrap' as const,
-  alignItems: 'center',
   justifyContent: 'center',
-  gap: '10px',
-  width: '90%',
-  boxSizing: 'border-box' as const,
+  margin: '20px 0',
+  width: '100%',
 },
-  pageNumbers: {
-    display: 'flex-wrap',
-    gap: '5px',
-  },
-  pageButton: {
-    padding: '8px 12px',
-    border: '1px solid #ddd',
-    backgroundColor: '#fff',
-    cursor: 'pointer',
-    borderRadius: '4px',
-    fontSize: '14px',
-  },
-  activePageButton: {
-    backgroundColor: '#007bff',
-    color: '#fff',
-    borderColor: '#007bff',
-  },
-  disabledButton: {
-    backgroundColor: '#f8f9fa',
-    color: '#6c757d',
-    cursor: 'not-allowed',
-    border: '1px solid #dee2e6',
-  },
-  pageInfo: {
-    textAlign: 'center' as const,
-    fontSize: '14px',
-    color: '#666',
-    marginTop: '10px',
-  },
+pageInfo: {
+  textAlign: 'center' as const,
+  fontSize: '14px',
+  color: '#666',
+  marginTop: '10px',
+},
 filtersContainer: {
   marginBottom: '20px',
   display: 'flex',

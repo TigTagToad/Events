@@ -10,6 +10,7 @@ import { AuthProvider } from "./contexts/authContext"
 import  EventPage from './pages/event'
 import AdminSignUpScreen from './pages/adminSignUpPage'
 import CreateEvents from './pages/createEvent'
+import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
  
 

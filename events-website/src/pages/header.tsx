@@ -1,5 +1,8 @@
 import {Link, useLocation} from "react-router-dom"
 import { useAuth } from '../contexts/authContext'
+import { Button, Container, Row} from "react-bootstrap"
+
+
 
 export const Header = () => {
     const { userProfile, userLoggedIn, loading, logout } = useAuth()
@@ -31,49 +34,54 @@ export const Header = () => {
     
     return (
         <header id="nav-header">
-            <h1>
-                Welcome, {getWelcomeMessage()}!
-                {!loading && userLoggedIn && isAdmin && (
-                    <span style={{ 
-                        marginLeft: '8px', 
-                        fontSize: '14px', 
-                        backgroundColor: '#4CAF50', 
-                        color: 'white', 
-                        padding: '2px 6px', 
-                        borderRadius: '3px',
-                        fontWeight: 'normal',
-                        maxWidth: '100%'
-                    }}>
-                        Admin
-                    </span>
-                )}
-            </h1>
-           
-            <nav>
-                <Link to="/home" className="nav-link"> Home </Link>
-                
-                {!loading && userLoggedIn && isAdmin && !isOnCreateEventPage && (
-                    <Link to="/create-event" className="nav-link"> Create Event </Link>
-                    
-                )}
-                {!loading && userLoggedIn && isAdmin && !isOnCreateEventPage && (
-                    <Link to="/signup-admin" className="nav-link"> Create New Admin </Link>
-                    
-                )}
-                
-                {!loading && (
-                    userLoggedIn ? (
-                        <button 
-                            onClick={handleLogout} 
-                            className="logout-btn"
-                        >
-                            Sign Out
-                        </button>
-                    ) : (
-                        <Link to="/signin" className="nav-link"> Sign In </Link>
-                    )
-                )}
-            </nav>
+        <Container>
+            <Row>
+                <h1>
+                    Welcome, {getWelcomeMessage()}!
+                    {!loading && userLoggedIn && isAdmin && (
+                        <span style={{ 
+                            marginLeft: '8px', 
+                            fontSize: '14px', 
+                            backgroundColor: '#4CAF50', 
+                            color: 'white', 
+                            padding: '2px 6px', 
+                            borderRadius: '3px',
+                            fontWeight: 'normal',
+                            maxWidth: '100%'
+                        }}>
+                            Admin
+                        </span>
+                    )}
+                </h1>
+            </Row>
+            <Row>
+                <div className="navbar navbar-expand-lg justify-content-center">
+                    <div className="navbar-nav flex-wrap">
+                        <Link to="/home" className="nav-link"> Home </Link>
+                        
+                        {!loading && userLoggedIn && isAdmin && !isOnCreateEventPage && (
+                            <>
+                                <Link to="/create-event" className="nav-link"> Create Event </Link>
+                                <Link to="/signup-admin" className="nav-link"> Create New Admin </Link>
+                            </>
+                        )}
+                        
+                        {!loading && (
+                            userLoggedIn ? (
+                                <Button variant="danger"
+                                    onClick={handleLogout} 
+                                    className="logout-btn nav-link"
+                                >
+                                    Sign Out
+                                </Button>
+                            ) : (
+                                <Link to="/signin" className="nav-link"> Sign In </Link>
+                            )
+                        )}
+                    </div>
+                </div>
+            </Row>
+        </Container>
         </header>
     )
 }
