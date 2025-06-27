@@ -6,5 +6,17 @@ export default defineConfig({
   plugins: [react()],
   server: {
     allowedHosts: ["events-1-jmmq.onrender.com"]
-  }
+  },
+  css: {
+     preprocessorOptions: {
+        scss: {
+          silenceDeprecations: [
+            'import',
+            'mixed-decls',
+            'color-functions',
+            'global-builtin',
+          ],
+        },
+     },
+  },
 })
