@@ -5,6 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Pagination from 'react-bootstrap/Pagination';
 import EventCard from '../components/EventCard';
+import Loading from '../components/SpinnerLoader'; // Import your loading component
 
 
 
@@ -30,8 +31,10 @@ export default function Home() {
   const [selectedCity, setSelectedCity] = useState('');
   const [cities, setCities] = useState<string[]>([]);
   const [eventsPerPage, setEventsPerPage] = useState(getEventsPerPage());
+  const [pageLoading, setPageLoading] = useState<boolean>(true);
 
   const totalPages = Math.ceil(totalEvents / eventsPerPage);
+
 
   // Effect to handle window resize for updating events per page
   useEffect(() => {
@@ -221,10 +224,17 @@ useEffect(() => {
 
     return items;
   };
+      useEffect(() => {
+  
+          setTimeout(() => setPageLoading(false), 330)
+      }, [])
+      if (pageLoading) {
+          return <Loading/>
+      }
 
   return (
-    <Container className="bg-white p-3 p-md-4"
-    style={{ width: containerMinWidth, height: containerMinHeight}} >
+    <Container className="p-3 p-md-4 bg-transparent"
+    style={{ width: containerMinWidth, height: containerMinHeight, backgroundColor: 'transparent'}} >
       {/* Search and Filter Bar */}
       <Row className="mb-4 justify-content-center align-items-center g-2">
         <Col xs={12} sm={12} md>
@@ -307,7 +317,7 @@ useEffect(() => {
       <EventCard eventlisting={eventlisting} />
     </Col>
   ))}
-  {/* Add placeholders to keep grid consistent */}
+ 
   
 </Row>
           ) : (
@@ -316,9 +326,9 @@ useEffect(() => {
             </div>
           )}
           
-          <div className="d-flex flex-column align-items-center mt-4">
+          <div className="d-flex flex-column align-items-center mt-4" >
             {totalPages > 1 && (
-                <Pagination>{renderPaginationItems()}</Pagination>
+                <Pagination className='my-pagination'>{renderPaginationItems()}</Pagination>
             )}
             <div className="text-center text-muted" style={{ fontSize: '0.9rem' }}>
               Showing page {currentPage + 1} of {totalPages} ({totalEvents} events found)

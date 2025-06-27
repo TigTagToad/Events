@@ -167,6 +167,8 @@ const SignUpScreen = () => {
           type="submit"
           disabled={loading}
           style={{
+            backgroundColor: '#C5EDCA',
+            color: '#000',
             cursor: loading ? 'not-allowed' : 'pointer'
           }}
         >

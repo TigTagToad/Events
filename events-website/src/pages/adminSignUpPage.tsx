@@ -167,7 +167,7 @@ const AdminSignUpScreen = () => {
           type="submit"
           disabled={loading}
           className={`btn ${loading ? 'btn-secondary' : 'btn-primary'} w-100`}
-          style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
+          style={{ cursor: loading ? 'not-allowed' : 'pointer', backgroundColor: '#C5EDCA', color: '#000', borderColor: '#C5EDCA' }}
         >
           {loading ? 'Creating Admin Account...' : 'Sign Up as Admin'}
         </button>

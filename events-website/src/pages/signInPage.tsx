@@ -89,9 +89,16 @@ const SignInScreen: React.FC = () => {
                     )}
 
                     <button
+                        
                         className='m-3'
                         type="submit"
                         disabled={isSigningIn}
+                        style={{
+                            backgroundColor: '#C5EDCA',
+                            cursor: isSigningIn ? 'not-allowed' : 'pointer',
+                            color: '#FCFCFF'
+                        }}
+                        aria-label="Sign In Button"
                     >
                         {isSigningIn ? 'Signing In...' : 'Sign In'}
                     </button>
@@ -100,7 +107,9 @@ const SignInScreen: React.FC = () => {
                 </>
                 <p>
                     Don't have an account?{' '}
-                    <Link to="/signup">Sign up</Link>
+                    <a className="link-info" href="/signup">
+                        Sign Up
+                    </a>
                 </p>
                 </div>
 

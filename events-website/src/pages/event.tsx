@@ -293,14 +293,16 @@ const EventPage = () => {
               disabled={editLoading}
               className="btn btn-success"
             >
+              <i className="bi-check-circle me-2"></i>
               {editLoading ? "Saving..." : "Save Changes"}
             </button>
             <button
               type="button"
               onClick={cancelEditing}
               disabled={editLoading}
-              className="btn btn-secondary"
+              className="btn btn-danger"
             >
+              <i className="bi-x-circle me-2"></i>
               Cancel
             </button>
           </div>
@@ -316,10 +318,13 @@ const EventPage = () => {
 
           <div className="d-flex justify-content-center flex-wrap gap-2 mt-4">
           <button
+            
             onClick={handleEventSignUp}
             disabled={signUpLoading}
             className={`btn ${attending ? 'btn-outline-danger' : 'btn-primary'}`}
+            style={{ backgroundColor: attending ? '#A30B37' : '#C5EDCA', color: attending ? '#FCFCFF' : '#000', borderColor: attending ? '#F5C6CB' : '#C5EDCA' }}
           >
+            <i className="bi bi-ticket me-2"></i>
             {signUpLoading
               ? 'Processing...'
               : attending
@@ -328,17 +333,22 @@ const EventPage = () => {
           </button>
 
           <button onClick={handleAddToCalendar} className="btn btn-outline-secondary">
-            Add to Calendar
+            <i className="bi bi-calendar-event me-2"></i>
+             Add to Calendar
           </button>
 
           {isAdmin && (
             <>
-              <button onClick={startEditing} className="btn btn-warning">Edit</button>
+              <button onClick={startEditing} className="btn btn-warning" >
+                <i className="bi-pencil me-2"></i>
+                Edit</button>
               <button
                 onClick={handleDeleteEvent}
                 disabled={deleteLoading}
                 className="btn btn-danger"
+                style={{ backgroundColor: '#a30b37', color: '#FCFCFF', borderColor: '#A30B37' }}
               >
+                <i className="bi-trash me-2"></i>
                 {deleteLoading ? 'Deleting...' : 'Delete'}
               </button>
             </>

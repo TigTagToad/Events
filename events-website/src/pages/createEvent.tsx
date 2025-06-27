@@ -172,10 +172,12 @@ const CreateEvents = () => {
           </div>
 
           <div className="d-flex justify-content-center gap-2">
-            <button type="submit" className="btn btn-success" disabled={createLoading}>
+            <button type="submit" className="btn btn-success" disabled={createLoading} style={{backgroundColor: '#C5EDCA', color: '#000', borderColor: '#C5EDCA'}}>
+               <i className="bi-check-circle me-2"></i>
               {createLoading ? "Creating Event…" : "Create Event"}
             </button>
-            <button type="button" className="btn btn-secondary" onClick={handleCancel}>
+            <button type="button" className="btn btn-danger" onClick={handleCancel} style={{backgroundColor: '#A30B37', color: '#FCFCFF', borderColor: '#A30B37'}}>
+              <i className="bi-x-circle me-2"></i>
               Cancel
             </button>
           </div>
