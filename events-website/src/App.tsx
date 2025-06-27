@@ -11,18 +11,22 @@ import  EventPage from './pages/event'
 import AdminSignUpScreen from './pages/adminSignUpPage'
 import CreateEvents from './pages/createEvent'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 function App() {
  
 
   return (
+   
       <AuthProvider>
 
       <BrowserRouter>
+
     <div>
       <Header/>
 
     </div>
-    <Routes>
+    <Routes >
+      <Route path="/" element={<Home />} />
       <Route path="/home" element={<Home />} />
       <Route path="/signup" element={<SignUpScreen />} />
       <Route path="/signin" element={<SignInScreen />} />
@@ -30,8 +34,11 @@ function App() {
       <Route path='/events/:event_id' element={<EventPage />}/>
       <Route path='/create-event' element={<CreateEvents/>}/>
     </Routes>
+    
     </BrowserRouter>
       </AuthProvider>
+  
+
   )
 }
 

@@ -1,6 +1,6 @@
 import {Link, useLocation} from "react-router-dom"
 import { useAuth } from '../contexts/authContext'
-import { Button, Container, Row} from "react-bootstrap"
+import { Badge, Container, Row} from "react-bootstrap"
 
 
 
@@ -34,23 +34,22 @@ export const Header = () => {
     
     return (
         <header id="nav-header">
-        <Container>
+        <Container className="mt-3">
             <Row>
                 <h1>
+                
                     Welcome, {getWelcomeMessage()}!
+                    
                     {!loading && userLoggedIn && isAdmin && (
-                        <span style={{ 
-                            marginLeft: '8px', 
-                            fontSize: '14px', 
-                            backgroundColor: '#4CAF50', 
-                            color: 'white', 
-                            padding: '2px 6px', 
-                            borderRadius: '3px',
-                            fontWeight: 'normal',
-                            maxWidth: '100%'
-                        }}>
+                        <a style={{fontSize: '1.2rem', marginLeft: '10px'}}>
+                          <Badge pill bg="secondary" >
+
+                            <i className="bi-eyeglasses"></i>
                             Admin
-                        </span>
+                            
+                        </Badge>
+
+                        </a>
                     )}
                 </h1>
             </Row>
@@ -68,14 +67,17 @@ export const Header = () => {
                         
                         {!loading && (
                             userLoggedIn ? (
-                                <Button variant="danger"
+                                <button className="btn btn-outline-danger"
                                     onClick={handleLogout} 
-                                    className="logout-btn nav-link"
+                                    
                                 >
+                                    <i className="bi-door-open me-2"></i> 
                                     Sign Out
-                                </Button>
+                                </button>
                             ) : (
-                                <Link to="/signin" className="nav-link"> Sign In </Link>
+                                
+                                    <Link to="/signin" className="nav-link"> Sign In </Link>
+                            
                             )
                         )}
                     </div>

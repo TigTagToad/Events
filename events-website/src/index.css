@@ -5,7 +5,6 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -100,3 +99,23 @@ button:focus-visible {
     display: inline-flex;
   width: 100%;
 }
+@font-face {
+  font-family: 'Showboat';
+  src: url('/fonts/Showboat.ttf') format('ttf');
+
+}
+.pagination .page-item .page-link {
+        background-color: #C5EDCA;
+        color: #1a1a1a;
+        border-color: #A30B37;
+    }
+ .pagination .page-item.active .page-link {
+        background-color: #a30b37;
+        border-color: #FCFCFF;
+        color: #FCFCFF
+
+    }
+
+    .pagination .page-item .page-link:hover {
+        background-color: #a30b37;
+    }

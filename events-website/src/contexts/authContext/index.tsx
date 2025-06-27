@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect, type ReactNode } from "react";
 import { auth } from "../../utils/firebase";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import supabase from "../../utils/supabase";
+import Loading from "../../components/SpinnerLoader";
 
 // Define user profile structure as stored in Supabase database
 interface UserProfile {
@@ -207,7 +208,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       {loading ? (
         // Show loading screen while checking auth status
         <div className="auth-loading">
-          <div>Loading...</div>
+          <Loading/>
         </div>
       ) : (
         // Once loading is complete, render the child components
