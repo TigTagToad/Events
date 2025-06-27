@@ -18,7 +18,7 @@ const SignUpScreen = () => {
 
   useEffect(() => {
   
-          setTimeout(() => setPageLoading(false), 3300)
+          setTimeout(() => setPageLoading(false), 330)
       }, [])
       if (pageLoading) {
           return <Loading/>
@@ -74,93 +74,88 @@ const SignUpScreen = () => {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px' }}>
-      <h2>Sign Up</h2>
+    <div className="container d-flex justify-content-center align-items-start py-5">
+      <div className='card shadow p-4 w-100'>
+
+      <h2>Create An Account</h2>
       <form onSubmit={handleSignUp}>
+        <div className="input-group mb-3">
+          <div className="input-group-append">
+            <span className="input-group-text" id="basic-addon1"
+            aria-label="Email Address">Email</span>
+          </div>
+              <input
+                className='form-control'
+                type="email"
+                placeholder='Email'
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+        </div>
+        <div className="input-group mb-3">
+          <div className="input-group-append">
+            <span className="input-group-text" id="basic-addon1"
+            aria-label="Username">Username</span>
+          </div>
         <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={{
-            width: '100%',
-            padding: '12px',
-            margin: '8px 0',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            fontSize: '16px',
-            boxSizing: 'border-box'
-          }}
-        />
-        <input
+          className='form-control'
           type="text" 
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
           minLength={3}
-          style={{
-            width: '100%',
-            padding: '12px',
-            margin: '8px 0',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            fontSize: '16px',
-            boxSizing: 'border-box'
-          }}
+  
         />
+        </div>
+        <div className='input-group mb-3'>
+          <div className="input-group-append">
+            <span className="input-group-text" id="basic-addon1"
+            aria-label="First Name">First Name</span>
+          </div>
         <input
+          className='form-control'
           type="text" 
-          placeholder="fist name"
+          placeholder="Fist Name"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
           required
           minLength={1}
-          style={{
-            width: '100%',
-            padding: '12px',
-            margin: '8px 0',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            fontSize: '16px',
-            boxSizing: 'border-box'
-          }}
         />
+        </div>
+        <div className='input-group mb-3'>
+          <div className="input-group-append">
+            <span className="input-group-text" id="basic-addon1"
+            aria-label="Last Name">Last Name</span>
+          </div>
         <input
+          className='form-control'
           type="text" 
-          placeholder="last name"
+          placeholder="Last Name"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
           required
           minLength={1}
-          style={{
-            width: '100%',
-            padding: '12px',
-            margin: '8px 0',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            fontSize: '16px',
-            boxSizing: 'border-box'
-          }}
+
         />
+        </div>
+        <div className='input-group mb-3'>
+          <div className="input-group-append">
+            <span className="input-group-text" id="basic-addon1"
+            aria-label="Password">Password</span>
+          </div>
         <input
+          className='form-control'
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
           minLength={6}
-          style={{
-            width: '100%',
-            padding: '12px',
-            margin: '8px 0',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            fontSize: '16px',
-            boxSizing: 'border-box'
-          }}
         />
+        </div>
+        
 
         {error && (
           <div style={{ color: 'red', margin: '8px 0', fontSize: '14px' }}>
@@ -172,19 +167,13 @@ const SignUpScreen = () => {
           type="submit"
           disabled={loading}
           style={{
-            width: '100%',
-            padding: '12px',
-            backgroundColor: loading ? '#ccc' : '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            fontSize: '16px',
             cursor: loading ? 'not-allowed' : 'pointer'
           }}
         >
           {loading ? 'Creating Account...' : 'Sign Up'}
         </button>
       </form>
+      </div>
     </div>
   );
 };

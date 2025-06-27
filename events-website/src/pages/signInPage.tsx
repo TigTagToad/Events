@@ -47,14 +47,21 @@ const SignInScreen: React.FC = () => {
 
     return (
         
-            <div>
+            <div className="container d-flex justify-content-center align-items-start py-5">
+                <div className='card shadow p-4 w-100'>
+
                 <div>
                     <h3>Welcome Back</h3>
                 </div>
                 <form onSubmit={onSubmit}>
-                    <div>
-                        <label>Email</label>
+                    <div className="input-group mb-3">
+                        
+                        <div className="input-group-append">
+                            <span className="input-group-text" id="basic-addon1"
+                            aria-label="Login Email Address">Email</span>
+                        </div>
                         <input
+                            className='form-control'
                             type="email"
                             autoComplete="email"
                             required
@@ -63,9 +70,12 @@ const SignInScreen: React.FC = () => {
                         />
                     </div>
 
-                    <div>
-                        <label>Password</label>
+                    <div className="input-group mb-3">
+                        <div className="input-group-append">
+                            <span className="input-group-text" id="basic-addon1" aria-label="Login Password">Password</span>
+                        </div>
                         <input
+                            className='form-control'
                             type="password"
                             autoComplete="current-password"
                             required
@@ -79,17 +89,20 @@ const SignInScreen: React.FC = () => {
                     )}
 
                     <button
+                        className='m-3'
                         type="submit"
                         disabled={isSigningIn}
                     >
                         {isSigningIn ? 'Signing In...' : 'Sign In'}
                     </button>
                 </form>
-
+                <>
+                </>
                 <p>
                     Don't have an account?{' '}
                     <Link to="/signup">Sign up</Link>
                 </p>
+                </div>
 
 
             </div>

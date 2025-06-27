@@ -11,12 +11,15 @@ interface EventCardProps {
 const EventCard = ({ eventlisting }: EventCardProps) => {
     return (
         <Card 
-            border="light"
-            text="light"
-            bg="dark"
-            className="mb-2 h-100" // Added h-100 for consistent height
-            style={{ width: '18rem', minHeight: '15rem' }} // Increased height and used minHeight
-        >
+    border="light"
+    text="light"
+    bg="dark"
+    className="h-100 w-100"
+    style={{ 
+        maxWidth: '100%',
+        height: '260px' // Set a fixed height (adjust as needed)
+    }}
+>
             <Card.Body className="d-flex flex-column">
                 <Card.Title className="mb-2">{eventlisting.event_name}</Card.Title>
                 <Card.Text className="mb-2">{eventlisting.event_date}</Card.Text>
@@ -28,7 +31,8 @@ const EventCard = ({ eventlisting }: EventCardProps) => {
                         <Link 
                             to={`/events/${eventlisting.event_id}`} 
                             key={eventlisting.event_id}
-                            style={{ color: 'inherit', textDecoration: 'none' }}
+                            className="text-decoration-none"
+                            style={{ color: 'inherit' }}
                         >
                             See More
                         </Link>

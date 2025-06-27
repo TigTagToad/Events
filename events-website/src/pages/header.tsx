@@ -34,7 +34,7 @@ export const Header = () => {
     
     return (
         <header id="nav-header">
-        <Container>
+        <Container className="mt-5">
             <Row>
                 <h1>
                     Welcome, {getWelcomeMessage()}!
@@ -68,14 +68,16 @@ export const Header = () => {
                         
                         {!loading && (
                             userLoggedIn ? (
-                                <Button variant="danger"
+                                <button className="btn btn-outline-danger"
                                     onClick={handleLogout} 
-                                    className="logout-btn nav-link"
+                                    
                                 >
                                     Sign Out
-                                </Button>
+                                </button>
                             ) : (
-                                <Link to="/signin" className="nav-link"> Sign In </Link>
+                                
+                                    <Link to="/signin" className="nav-link"> Sign In </Link>
+                            
                             )
                         )}
                     </div>

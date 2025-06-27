@@ -1,20 +1,25 @@
-import { useParams, useNavigate } from "react-router-dom"
-import { useEffect, useState } from "react"
-import supabase from "../utils/supabase"
-import { useAuth } from "../contexts/authContext"
-import addToGoogleCalendar from "../utils/googleCalender"
+import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import supabase from "../utils/supabase";
+import { useAuth } from "../contexts/authContext";
+import addToGoogleCalendar from "../utils/googleCalender";
+import Loading from "../components/SpinnerLoader";
 
 const EventPage = () => {
-  const { event_id } = useParams()
-  const { userProfile } = useAuth()
-  const [fetchError, setFetchError] = useState<string | null>(null)
-  const [event, setEvent] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [attending, setAttending] = useState<boolean>(false)
-  const [signUpLoading, setSignUpLoading] = useState<boolean>(false)
-  const [isEditing, setIsEditing] = useState<boolean>(false)
-  const [editLoading, setEditLoading] = useState<boolean>(false)
-  const [deleteLoading, setDeleteLoading] = useState<boolean>(false)
+  const { event_id } = useParams();
+  const { userProfile } = useAuth();
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [event, setEvent] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [attending, setAttending] = useState<boolean>(false);
+  const [signUpLoading, setSignUpLoading] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [editLoading, setEditLoading] = useState<boolean>(false);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
+
+  const isAdmin = userProfile?.admin || false;
+
   const [editForm, setEditForm] = useState({
     event_name: '',
     event_date: '',
@@ -23,160 +28,97 @@ const EventPage = () => {
     venue: '',
     start_time: '',
     end_time: ''
-  })
-  const navigate = useNavigate()
+  });
 
-  // Check if user is admin (assuming there's an is_admin field in userProfile)
-  const isAdmin = userProfile?.admin || false
+  const getSignUpId = () => event_id && userProfile?.firebase_uid ? event_id + userProfile.firebase_uid : null;
 
-  // Generate signup ID
-  const getSignUpId = () => {
-    if (event_id && userProfile?.firebase_uid) {
-      return event_id + userProfile.firebase_uid
-    }
-    return null
-  }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setEditForm(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleEventSignUp = async () => {
     if (!event_id || !userProfile) {
-      navigate('/signin', { replace: true })
-      return
+      navigate('/signin', { replace: true });
+      return;
     }
 
-    setSignUpLoading(true)
-    
-    try {
-      const signUpId = getSignUpId()
-      if (!signUpId) return
+    setSignUpLoading(true);
+    const signUpId = getSignUpId();
+    if (!signUpId) return;
 
-      // Check if already signed up
+    try {
       if (attending) {
-        // Optional: Handle unsigning up
         const { error: deleteError } = await supabase
           .from('Signups')
           .delete()
-          .eq('signup_id', signUpId)
-        
-        if (!deleteError) {
-          setAttending(false)
-        }
+          .eq('signup_id', signUpId);
+        if (!deleteError) setAttending(false);
       } else {
-        // Sign up for event
-        const date = new Date().toISOString().split('T')[0] // Better date format: YYYY-MM-DD
-        
+        const date = new Date().toISOString().split('T')[0];
         const { data, error } = await supabase
           .from('Signups')
-          .insert([
-            { 
-              signup_id: signUpId, 
-              event_id: event_id, 
-              signup_date: date, 
-              user_id: userProfile.firebase_uid
-            },
-          ])
-          .select()
-        
-        if(data){
-        console.log("sucess")
-     }
-
+          .insert([{
+            signup_id: signUpId,
+            event_id,
+            signup_date: date,
+            user_id: userProfile.firebase_uid
+          }])
+          .select();
+        if (data) setAttending(true);
         if (error) {
-          console.error('Error signing up for event:', error)
-          setFetchError('Could not sign up for event')
-        } else {
-          setAttending(true)
+          console.error('Error signing up:', error);
+          setFetchError('Could not sign up for event');
         }
       }
     } catch (error) {
-      console.error('Error in handleEventSignUp:', error)
-      setFetchError('An error occurred while processing your request')
+      console.error('Sign up error:', error);
+      setFetchError('An error occurred while processing your request');
     } finally {
-      setSignUpLoading(false)
+      setSignUpLoading(false);
     }
-  }
+  };
 
   const handleEditEvent = async () => {
-    if (!event_id || !isAdmin) return
+    if (!event_id || !isAdmin) return;
 
-    setEditLoading(true)
-
+    setEditLoading(true);
     try {
       const { data, error } = await supabase
         .from('Events')
-        .update({
-          event_name: editForm.event_name,
-          event_date: editForm.event_date,
-          event_dsc: editForm.event_dsc,
-          event_location: editForm.event_location,
-          venue: editForm.venue,
-          start_time: editForm.start_time,
-          end_time: editForm.end_time
-        })
+        .update({ ...editForm })
         .eq('event_id', event_id)
         .select()
-        .single()
+        .single();
 
       if (error) {
-        console.error('Error updating event:', error)
-        setFetchError('Could not update event')
+        setFetchError('Could not update event');
       } else {
-        setEvent(data)
-        setIsEditing(false)
-        setFetchError(null)
+        setEvent(data);
+        setIsEditing(false);
       }
     } catch (error) {
-      console.error('Error in handleEditEvent:', error)
-      setFetchError('An error occurred while updating the event')
+      console.error('Update error:', error);
     } finally {
-      setEditLoading(false)
+      setEditLoading(false);
     }
-  }
+  };
 
   const handleDeleteEvent = async () => {
-    if (!event_id || !isAdmin) return
+    if (!event_id || !isAdmin) return;
+    if (!window.confirm(`Delete "${event.event_name}"?`)) return;
 
-    // Confirm deletion
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete "${event.event_name}"? This action cannot be undone.`
-    )
-    
-    if (!confirmDelete) return
-
-    setDeleteLoading(true)
-
+    setDeleteLoading(true);
     try {
-      // First delete all signups for this event
-      const { error: signupError } = await supabase
-        .from('Signups')
-        .delete()
-        .eq('event_id', event_id)
-
-      if (signupError) {
-        console.error('Error deleting signups:', signupError)
-        setFetchError('Could not delete event signups')
-        return
-      }
-
-      // Then delete the event
-      const { error: eventError } = await supabase
-        .from('Events')
-        .delete()
-        .eq('event_id', event_id)
-
-      if (eventError) {
-        console.error('Error deleting event:', eventError)
-        setFetchError('Could not delete event')
-      } else {
-        // Navigate back to events list or homepage
-        navigate('/events', { replace: true })
-      }
+      await supabase.from('Signups').delete().eq('event_id', event_id);
+      const { error } = await supabase.from('Events').delete().eq('event_id', event_id);
+      if (!error) navigate('/events', { replace: true });
     } catch (error) {
-      console.error('Error in handleDeleteEvent:', error)
-      setFetchError('An error occurred while deleting the event')
+      console.error('Delete error:', error);
     } finally {
-      setDeleteLoading(false)
+      setDeleteLoading(false);
     }
-  }
+  };
 
   const startEditing = () => {
     setEditForm({
@@ -187,12 +129,12 @@ const EventPage = () => {
       venue: event.venue || '',
       start_time: event.start_time || '',
       end_time: event.end_time || ''
-    })
-    setIsEditing(true)
-  }
+    });
+    setIsEditing(true);
+  };
 
   const cancelEditing = () => {
-    setIsEditing(false)
+    setIsEditing(false);
     setEditForm({
       event_name: '',
       event_date: '',
@@ -201,295 +143,213 @@ const EventPage = () => {
       venue: '',
       start_time: '',
       end_time: ''
-    })
-  }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setEditForm(prev => ({
-      ...prev,
-      [name]: value
-    }))
-  }
-  
-  // Check if user is already signed up
-  useEffect(() => {
-    const fetchSignUp = async () => {
-      const signUpId = getSignUpId()
-      if (!signUpId) return
-
-      try {
-        const { data, error } = await supabase
-          .from('Signups')
-          .select('*')
-          .eq('signup_id', signUpId)
-          .single()
-        
-        if (data && !error) {
-          setAttending(true)
-        }
-      } catch (error) {
-        // User not signed up - this is expected behavior
-        console.log('User not signed up for this event')
-      }
-    }
-    
-    if (userProfile && event_id) {
-      fetchSignUp()
-    }
-  }, [event_id, userProfile])
-
-  // Fetch event details
-  useEffect(() => {
-    const fetchEvents = async () => {
-      if (!event_id) return
-      
-      setLoading(true)
-      
-      try {
-        const { data, error } = await supabase
-          .from('Events')
-          .select('*')
-          .eq('event_id', event_id)
-          .single()
-        
-        if (error) {
-          setFetchError('Could not fetch event')
-          setEvent(null)
-          console.log(error)
-        } else {
-          setEvent(data)
-          setFetchError(null)
-        }
-      } catch (error) {
-        console.error('Error fetching event:', error)
-        setFetchError('An unexpected error occurred')
-      } finally {
-        setLoading(false)
-      }
-    }
-    
-    fetchEvents()
-  }, [event_id])
-
-  // Loading state
-  if (loading) {
-    return <div>Loading...</div>
-  }
-
-  // Error state
-  if (fetchError) {
-    return <div className="error">{fetchError}</div>
-  }
-
-  // No event found
-  if (!event) {
-    return <div>Event not found</div>
-  }
+    });
+  };
 
   const handleAddToCalendar = () => {
-    // Create proper date objects using the event's date and times
-    const eventDate = event.event_date
-    const startTime = event.start_time || '10:00:00'
-    const endTime = event.end_time || '11:00:00'
-    
-    const startDate = new Date(`${eventDate}T${startTime}`)
-    const endDate = new Date(`${eventDate}T${endTime}`)
-    
+    const start = new Date(`${event.event_date}T${event.start_time || '10:00:00'}`);
+    const end = new Date(`${event.event_date}T${event.end_time || '11:00:00'}`);
     addToGoogleCalendar({
       title: event.event_name,
-      startDate: startDate,
-      endDate: endDate,
+      startDate: start,
+      endDate: end,
       description: event.event_dsc,
       location: event.venue || event.event_location
     });
   };
-   const containerStyle = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '100vh',
-    padding: '20px',
-    boxSizing: 'border-box' as const
-  }
-    const cardStyle = {
-    maxWidth: '600px',
-    width: '90%',
-    padding: '30px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    borderRadius: '8px',
-    backgroundColor: 'white'
-  }
-  // Render event
-  return (
-     <div style={containerStyle}>
 
-    <div className="event-card" style={cardStyle}>
-      {isEditing ? (
-        // Edit form
-        <div className="edit-form">
-        <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
-              Event Name*
-        </label>
-          <input
-            type="text"
-            name="event_name"
-            value={editForm.event_name}
-            onChange={handleInputChange}
-            placeholder="Event Name"
-            style={{ marginBottom: '10px', padding: '8px', width: '100%' }}
-          />
-        <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
-              Event Date*
-        </label>
-          <input
-            type="date"
-            name="event_date"
-            value={editForm.event_date}
-            onChange={handleInputChange}
-            style={{ marginBottom: '10px', padding: '8px', width: '100%' }}
-          />
-          <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-        <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
-              Start Time
-        </label>
+  useEffect(() => {
+    const fetchSignUp = async () => {
+      const signUpId = getSignUpId();
+      if (!signUpId) return;
+
+      const { data } = await supabase
+        .from('Signups')
+        .select('*')
+        .eq('signup_id', signUpId)
+        .single();
+
+      if (data) setAttending(true);
+    };
+
+    if (userProfile && event_id) fetchSignUp();
+  }, [event_id, userProfile]);
+
+  useEffect(() => {
+    const fetchEvent = async () => {
+      if (!event_id) return;
+      setLoading(true);
+
+      const { data, error } = await supabase
+        .from('Events')
+        .select('*')
+        .eq('event_id', event_id)
+        .single();
+
+      if (error) {
+        setFetchError('Could not fetch event');
+      } else {
+        setEvent(data);
+      }
+      setLoading(false);
+    };
+
+    fetchEvent();
+  }, [event_id]);
+
+  if (loading) return <Loading />;
+  if (fetchError) return <div className="alert alert-danger">{fetchError}</div>;
+  if (!event) return <div className="text-muted">Event not found.</div>;
+
+  return (
+    <div className="container d-flex justify-content-center align-items-start py-5">
+      <div className="card shadow p-4 w-100">
+
+      {isEditing && isAdmin ? (
+        <form>
+          <div className="input-group mb-3">
+            <span className="input-group-text">Event Name</span>
             <input
+              className="form-control"
+              name="event_name"
+              value={editForm.event_name}
+              onChange={handleInputChange}
+              placeholder="Event Name"
+              required
+            />
+          </div>
+
+          <div className="input-group mb-3">
+            <span className="input-group-text">Date</span>
+            <input
+              className="form-control"
+              type="date"
+              name="event_date"
+              value={editForm.event_date}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="input-group mb-3">
+            <span className="input-group-text">Start Time</span>
+            <input
+              className="form-control"
               type="time"
               name="start_time"
               value={editForm.start_time}
               onChange={handleInputChange}
-              placeholder="Start Time"
-              style={{ padding: '8px', flex: 1 }}
             />
-        <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
-              End Time
-        </label>
+          </div>
+
+          <div className="input-group mb-3">
+            <span className="input-group-text">End Time</span>
             <input
+              className="form-control"
               type="time"
               name="end_time"
               value={editForm.end_time}
               onChange={handleInputChange}
-              placeholder="End Time"
-              style={{ padding: '8px', flex: 1 }}
             />
           </div>
-        <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
-              Event Description
-        </label>
-          <textarea
-            name="event_dsc"
-            value={editForm.event_dsc}
-            onChange={handleInputChange}
-            placeholder="Event Description"
-            rows={4}
-            style={{ marginBottom: '10px', padding: '8px', width: '100%', resize: 'vertical' }}
-          />
-        <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
-              Event Location/City
-        </label>
-          <input
-            type="text"
-            name="event_location"
-            value={editForm.event_location}
-            onChange={handleInputChange}
-            placeholder="City/Location"
-            style={{ marginBottom: '10px', padding: '8px', width: '100%' }}
-          />
-        <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
-              Venue
-        </label>
-          <input
-            type="text"
-            name="venue"
-            value={editForm.venue}
-            onChange={handleInputChange}
-            placeholder="Venue"
-            style={{ marginBottom: '15px', padding: '8px', width: '100%' }}
-          />
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button 
+
+          <div className="input-group mb-3">
+            <span className="input-group-text">Location</span>
+            <input
+              className="form-control"
+              name="event_location"
+              value={editForm.event_location}
+              onChange={handleInputChange}
+              placeholder="City/Location"
+            />
+          </div>
+
+          <div className="input-group mb-3">
+            <span className="input-group-text">Venue</span>
+            <input
+              className="form-control"
+              name="venue"
+              value={editForm.venue}
+              onChange={handleInputChange}
+              placeholder="Venue"
+            />
+          </div>
+
+          <div className="input-group mb-3">
+            <span className="input-group-text">Description</span>
+            <textarea
+              className="form-control"
+              name="event_dsc"
+              rows={3}
+              value={editForm.event_dsc}
+              onChange={handleInputChange}
+              placeholder="Event Description"
+            />
+          </div>
+
+          <div className="d-flex justify-content-center gap-2">
+            <button
+              type="button"
               onClick={handleEditEvent}
               disabled={editLoading}
-              style={{ backgroundColor: '#4CAF50', color: 'white', padding: '8px 16px', border: 'none', borderRadius: '4px' }}
+              className="btn btn-success"
             >
-              {editLoading ? 'Saving...' : 'Save Changes'}
+              {editLoading ? "Saving..." : "Save Changes"}
             </button>
-            <button 
+            <button
+              type="button"
               onClick={cancelEditing}
               disabled={editLoading}
-              style={{ backgroundColor: '#f44336', color: 'white', padding: '8px 16px', border: 'none', borderRadius: '4px' }}
+              className="btn btn-secondary"
             >
               Cancel
             </button>
           </div>
-        </div>
+        </form>
       ) : (
-        // Display event
         <>
-          {isAdmin && (
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '15px',  justifyContent: 'center' }}>
-              <button 
-                onClick={startEditing}
-                style={{ 
-                  backgroundColor: '#2196F3', 
-                  color: 'white', 
-                  padding: '6px 12px', 
-                  border: 'none', 
-                  borderRadius: '4px',
-                  fontSize: '14px'
-                }}
-              >
-                Edit Event
-              </button>
-              <button 
-                onClick={handleDeleteEvent}
-                disabled={deleteLoading}
-                style={{ 
-                  backgroundColor: '#f44336', 
-                  color: 'white', 
-                  padding: '6px 12px', 
-                  border: 'none', 
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  opacity: deleteLoading ? 0.6 : 1
-                }}
-              >
-                {deleteLoading ? 'Deleting...' : 'Delete Event'}
-              </button>
-            </div>
-          )}
-          <h3>Event Title: {event.event_name}</h3>
+          <h2 className="mb-3">{event.event_name}</h2>
           <p><strong>Date:</strong> {event.event_date}</p>
-          {(event.start_time || event.end_time) && (
-            <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
-          )}
-          <p><strong>Event Discription:</strong> {event.event_dsc}</p>
-          <h4>City: {event.event_location}</h4>
-          {event.venue && <h4>Venue: {event.venue}</h4>}
-          <button 
+          <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
+          <p><strong>Location:</strong> {event.event_location}</p>
+          <p><strong>Venue:</strong> {event.venue}</p>
+          <p><strong>Description:</strong><br />{event.event_dsc}</p>
+
+          <div className="d-flex justify-content-center flex-wrap gap-2 mt-4">
+          <button
             onClick={handleEventSignUp}
             disabled={signUpLoading}
+            className={`btn ${attending ? 'btn-outline-danger' : 'btn-primary'}`}
           >
-            {signUpLoading 
-              ? 'Processing...' 
-              : attending 
-                ? 'Cancel Attendance' 
-                : 'Attend Event'
-            }
+            {signUpLoading
+              ? 'Processing...'
+              : attending
+                ? 'Cancel Attendance'
+                : 'Attend Event'}
           </button>
-          {attending && (
-            <p style={{ color: 'green', marginTop: '10px' }}>
-              ✓ You are registered for this event
-            </p>
+
+          <button onClick={handleAddToCalendar} className="btn btn-outline-secondary">
+            Add to Calendar
+          </button>
+
+          {isAdmin && (
+            <>
+              <button onClick={startEditing} className="btn btn-warning">Edit</button>
+              <button
+                onClick={handleDeleteEvent}
+                disabled={deleteLoading}
+                className="btn btn-danger"
+              >
+                {deleteLoading ? 'Deleting...' : 'Delete'}
+              </button>
+            </>
           )}
-          {attending && (
-            <button onClick={handleAddToCalendar}> Add to Google Calendar </button>
-          )}
+        </div>
+
         </>
       )}
+      </div>
     </div>
-     </div>
-  )
-}
+  );
+};
 
-export default EventPage
+export default EventPage;
