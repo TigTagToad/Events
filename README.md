@@ -18,7 +18,7 @@ Link to hosted website: https://events-1-jmmq.onrender.com/
 ## Tech Stack
 
 *   **Frontend:** React, TypeScript, Vite
-*   **Styling:** CSS (with some inline styles)
+*   **Styling:** CSS (with some inline styles), Bootstrap for React
 *   **Routing:** React Router DOM
 *   **Authentication:** Firebase Authentication
 *   **Database:** Supabase
